@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/main_tv_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="150dp"
+        android:elevation="1dp"
+        android:text="双击放大"
+        android:textColor="#FFFFFF" />
+
+
+    <SurfaceView
+        android:id="@+id/main_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="40dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/main_press_control"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.ruanchao.videoedit.view.BothWayProgressBar
+                android:id="@+id/main_progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#ffffff" />
+
+            <ImageView
+                android:id="@+id/iv_record_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:src="@mipmap/end_record" />
+
+            <ImageView
+                android:id="@+id/iv_return_record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/iv_record_img"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:visibility="invisible"
+                android:src="@mipmap/return_record" />
+
+            <ImageView
+                android:id="@+id/iv_record_success"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/iv_record_img"
+                android:visibility="invisible"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:src="@mipmap/success_record" />
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00ffffff"
+        android:theme="@style/VideoEditToolbarTheme"
+        app:navigationIcon="@mipmap/back" />
+</FrameLayout>

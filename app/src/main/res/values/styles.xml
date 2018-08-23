@@ -8,4 +8,26 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="VideoEditToolbarTheme" parent="Theme.AppCompat.Light">
+        <!--&lt;!&ndash; 设置 toolbar 溢出菜单的文字的颜色 &ndash;&gt;-->
+        <!--<item name="android:textColor">@android:color/holo_red_dark</item>-->
+        <!--&lt;!&ndash; 设置toolbar 溢出菜单的字体大小&ndash;&gt;-->
+        <!--<item name="android:textSize">16sp</item>-->
+        <!--&lt;!&ndash; 设置 显示在toobar上菜单文字的颜色 &ndash;&gt;-->
+        <!--<item name="actionMenuTextColor">#ffffff</item>-->
+        <!--&lt;!&ndash; 更换Toolbar OVerFlow menu icon &ndash;&gt;-->
+        <!--<item name="actionOverflowButtonStyle">@style/OverFlowIcon</item>-->
+        <!--&lt;!&ndash; 是否覆盖锚点，默认为true，即盖住Toolbar &ndash;&gt;-->
+        <!--<item name="overlapAnchor">false</item>-->
+        <!--&lt;!&ndash; 弹出层背景颜色 &ndash;&gt;-->
+        <!--<item name="android:popupBackground">#ffffff</item>-->
+        <!--&lt;!&ndash; 弹出层垂直方向上的偏移，负值会覆盖toolbar &ndash;&gt;-->
+        <!--<item name="android:dropDownVerticalOffset">20dp</item>-->
+        <!--&lt;!&ndash; 弹出层水平方向上的偏移，即距离屏幕左边的距离，负值会导致右边出现空隙 &ndash;&gt;-->
+        <!--<item name="android:dropDownHorizontalOffset">-2dp</item>-->
+    </style>
+    <style name="OverFlowIcon" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@mipmap/more</item>
+    </style>
+
 </resources>

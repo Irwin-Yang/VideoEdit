@@ -26,6 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.ruanchao.videoedit.activity.RecordActivity"></activity>
+
     </application>
 
 </manifest>

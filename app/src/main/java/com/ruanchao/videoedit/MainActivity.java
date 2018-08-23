@@ -12,12 +12,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ruanchao.videoedit.activity.BaseActivity;
+import com.ruanchao.videoedit.activity.RecordActivity;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.util.FFmpegUtil;
 
 import java.io.File;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "smallvideo";
     private static final String srcFile = PATH + File.separator + "hello.mp4";
@@ -39,7 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_main);
         Button mBtnTest = findViewById(R.id.btn_test);
         mBtnTest.setOnClickListener(this);
@@ -53,6 +55,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 testVideo();
                 break;
             case R.id.bt_record_video:
+                RecordActivity.startRecordActivity(MainActivity.this);
                 break;
             case R.id.bt_edit_video:
                 break;
