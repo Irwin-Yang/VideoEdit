@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.ruanchao.videoedit"
-        minSdkVersion 15
+        minSdkVersion 18
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -53,4 +53,9 @@ dependencies {
     api 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     api 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     api 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
+    api ('com.alibaba.android:vlayout:1.2.8@aar') {
+        transitive = true
+    }
+    api 'com.youth.banner:banner:1.4.10'  //最新版本
+    api "com.jph.takephoto:takephoto_library:4.0.3"
 }

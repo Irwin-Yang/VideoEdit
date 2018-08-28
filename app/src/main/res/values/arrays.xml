@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="water_location">
+        <item>左上方</item>
+        <item>右上方 </item>
+        <item>左下方</item>
+        <item>右下方</item>
+    </string-array>
+</resources>

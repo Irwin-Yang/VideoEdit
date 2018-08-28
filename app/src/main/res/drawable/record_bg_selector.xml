@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 默认时的背景图片-->
+    <item android:drawable="@drawable/end_record" />
+    <!-- 没有焦点时的背景图片 -->
+    <item android:state_window_focused="false" android:drawable="@drawable/end_record" />
+
+    <item android:state_pressed="true" android:drawable="@drawable/start_record" />
+    <item android:state_pressed="false" android:drawable="@drawable/end_record" />
+    <!--<item android:state_window_focused="true"  android:drawable="@drawable/start_record" />-->
+
+
+</selector>

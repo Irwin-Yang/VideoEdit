@@ -116,7 +116,6 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
         mTvTip = (TextView) findViewById(R.id.main_tv_tip);
 
         mStartButton.setOnTouchListener(this);
-        //自定义双向进度条    (这个地方差点把我急疯了!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
         mProgressBar = (BothWayProgressBar) findViewById(R.
                 id.main_progress_bar);
         mProgressBar.setOnProgressEndListener(this);
@@ -338,7 +337,7 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
             Toast.makeText(this,"请先拍摄视频",Toast.LENGTH_LONG).show();
             return;
         }
-        //VideoPlayActivity.start(this,mTargetFile.getAbsolutePath());
+        VideoPlayActivity.start(this,mTargetFile.getAbsolutePath());
         finish();
     }
 

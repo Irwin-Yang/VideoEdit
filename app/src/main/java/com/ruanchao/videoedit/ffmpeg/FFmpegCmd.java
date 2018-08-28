@@ -33,6 +33,13 @@ public class FFmpegCmd {
             }
         }).start();
     }
+
+    public static int execute(final String commands) {
+        String regulation = "[ \\t]+";
+        final String[] split = commands.split(regulation);
+        int result = handle(split);
+        return result;
+    }
     private native static int handle(String[] commands);
 
 }

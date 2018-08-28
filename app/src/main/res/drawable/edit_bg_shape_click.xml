@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+
+    <!-- 绿色边框圆角矩形 -->
+    <gradient
+        android:endColor="@color/edit_bg_click_color"
+        android:startColor="@color/edit_bg_click_color" />
+
+    <solid android:color="@color/edit_bg_click_color" />
+
+    <stroke
+        android:width="2dp"
+        android:color="@color/edit_bg_click_color" />
+
+    <corners
+        android:bottomLeftRadius="10dp"
+        android:bottomRightRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp" />
+
+</shape>
