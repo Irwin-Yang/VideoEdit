@@ -78,11 +78,16 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00ffffff"
-        android:theme="@style/VideoEditToolbarTheme"
-        app:navigationIcon="@mipmap/back" />
+        titlebar:fillStatusBar="true"
+        titlebar:leftType="imageButton"
+        titlebar:rightType="imageButton"
+        titlebar:titleBarColor="#00ffffff"
+        titlebar:showBottomLine="false"
+        titlebar:leftImageResource="@mipmap/back"
+        titlebar:rightImageResource="@mipmap/finish_icon" />
 </FrameLayout>

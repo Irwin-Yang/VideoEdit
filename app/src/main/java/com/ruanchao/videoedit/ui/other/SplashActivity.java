@@ -1,4 +1,4 @@
-package com.ruanchao.videoedit.activity;
+package com.ruanchao.videoedit.ui.other;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.ruanchao.videoedit.R;
 
-import com.ruanchao.videoedit.MainActivity;
+import com.ruanchao.videoedit.ui.video.MainActivity;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.FileUtil;
 

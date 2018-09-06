@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".ui.video.VideoShowActivity">
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        titlebar:leftType="textView"
+        titlebar:titleBarColor="#00ffffff"
+        titlebar:showBottomLine="false"
+        titlebar:leftDrawable="@mipmap/back"
+        titlebar:leftTextColor="#ffffff"
+        titlebar:leftText="视频预览" />
+</FrameLayout>

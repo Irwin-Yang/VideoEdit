@@ -16,12 +16,14 @@ public class SubAdapter extends DelegateAdapter.Adapter{
     private LayoutHelper layoutHelper;
     private int count;
     private int layoutId;
+    private int mViewTypeItem;
 
-    public SubAdapter(Context context, LayoutHelper layoutHelper, int layoutId, int count) {
+    public SubAdapter(Context context, LayoutHelper layoutHelper, int layoutId, int count,int viewTypeItem) {
         this.context = context;
         this.layoutHelper = layoutHelper;
         this.count = count;
         this.layoutId = layoutId;
+        this.mViewTypeItem = viewTypeItem;
     }
 
     @Override
@@ -40,6 +42,18 @@ public class SubAdapter extends DelegateAdapter.Adapter{
 
     }
 
+    /**
+     * 必须重写不然会出现滑动不流畅的情况
+     */
+    @Override
+    public int getItemViewType(int position) {
+        return mViewTypeItem;
+    }
+
+    /**
+     * 外面可能需要重写，不然count数量就固定了，不符合预期
+     * @return
+     */
     @Override
     public int getItemCount() {
         return count;

@@ -8,9 +8,14 @@ import android.support.annotation.NonNull;
 
 public class VideoInfo implements Comparable<VideoInfo> {
 
+    public static final int TYPE_VIDEO = 1;
+    public static final int TYPE_GIF = 2;
+    private int type = TYPE_VIDEO;
     private String videoPath;
     private long videoTime;
     private String videoTitle;
+    private String videoName;
+    private float duration;
 
     public String getVideoPath() {
         return videoPath;
@@ -36,6 +41,14 @@ public class VideoInfo implements Comparable<VideoInfo> {
         this.videoTitle = videoTitle;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public int compareTo(@NonNull VideoInfo liveVideoInfo) {
         int result = (int) (this.getVideoTime() - liveVideoInfo.getVideoTime());
@@ -43,5 +56,21 @@ public class VideoInfo implements Comparable<VideoInfo> {
             return 1;
         }
         return -result;
+    }
+
+    public String getVideoName() {
+        return videoName;
+    }
+
+    public void setVideoName(String videoName) {
+        this.videoName = videoName;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
     }
 }

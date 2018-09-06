@@ -1,4 +1,4 @@
-package com.ruanchao.videoedit.activity;
+package com.ruanchao.videoedit.ui.video;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -24,9 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ruanchao.videoedit.R;
+import com.ruanchao.videoedit.base.BaseActivity;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.BothWayProgressBar;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 
-public class RecordActivity extends BaseActivity implements SurfaceHolder.Callback, View.OnTouchListener, BothWayProgressBar.OnProgressEndListener, Toolbar.OnMenuItemClickListener, View.OnClickListener {
+public class RecordActivity extends BaseActivity implements SurfaceHolder.Callback, View.OnTouchListener, BothWayProgressBar.OnProgressEndListener, View.OnClickListener {
 
     private static final int LISTENER_START = 200;
     private static final String TAG = "MainActivity";
@@ -71,7 +72,7 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
     private MyHandler mHandler;
     private TextView mTvTip;
     private boolean isRunning;
-    Toolbar toolbar;
+    CommonTitleBar toolbar;
     ImageView mStartImg;
     ImageView mReturnRecord;
     ImageView mRecordSuccess;
@@ -85,9 +86,17 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
     }
 
     private void initView() {
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.inflateMenu(R.menu.video_edit_menu);
-        toolbar.setOnMenuItemClickListener(this);
+        toolbar = findViewById(R.id.titlebar);
+        toolbar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_BUTTON) {
+                    finish();
+                }else if (action == CommonTitleBar.ACTION_RIGHT_BUTTON){
+                    recordFinish();
+                }
+            }
+        });
         mStartImg = findViewById(R.id.iv_record_img);
         mRecordSuccess = findViewById(R.id.iv_record_success);
         mRecordSuccess.setOnClickListener(this);
@@ -337,28 +346,20 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
             Toast.makeText(this,"请先拍摄视频",Toast.LENGTH_LONG).show();
             return;
         }
-        VideoPlayActivity.start(this,mTargetFile.getAbsolutePath());
+        VideoEditActivity.start(this,mTargetFile.getAbsolutePath());
         finish();
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId() == R.id.action_success){
-            recordFinish();
-        }
-        return true;
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.iv_record_success:
-                recordFinish();
-                break;
             case R.id.iv_return_record:
                 mReturnRecord.setVisibility(View.INVISIBLE);
                 mRecordSuccess.setVisibility(View.INVISIBLE);
                 mStartImg.setVisibility(View.VISIBLE);
+                break;
+            case R.id.iv_record_success:
+                recordFinish();
                 break;
                 default:
                     break;

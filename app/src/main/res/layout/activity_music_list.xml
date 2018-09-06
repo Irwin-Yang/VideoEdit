@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.video.MusicListActivity">
+
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        titlebar:centerText="本地音乐列表"
+        titlebar:centerType="textView"
+        titlebar:leftDrawable="@drawable/comm_titlebar_back_normal"
+        titlebar:leftDrawablePadding="0dp"
+        titlebar:leftText="返回"
+        titlebar:leftType="textView" />
+
+    <android.support.v7.widget.RecyclerView
+        android:visibility="visible"
+        android:id="@+id/music_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

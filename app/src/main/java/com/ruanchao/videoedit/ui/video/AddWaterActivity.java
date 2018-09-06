@@ -1,4 +1,4 @@
-package com.ruanchao.videoedit.activity;
+package com.ruanchao.videoedit.ui.video;
 
 import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;

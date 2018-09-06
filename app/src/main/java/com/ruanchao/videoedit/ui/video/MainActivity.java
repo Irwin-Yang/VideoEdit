@@ -1,6 +1,7 @@
-package com.ruanchao.videoedit;
+package com.ruanchao.videoedit.ui.video;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -9,10 +10,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,40 +21,56 @@ import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
-import com.ruanchao.videoedit.activity.BaseActivity;
-import com.ruanchao.videoedit.activity.RecordActivity;
+import com.bumptech.glide.Glide;
+import com.ruanchao.videoedit.MainApplication;
+import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.adapter.GlideImageLoader;
 import com.ruanchao.videoedit.adapter.SubAdapter;
+import com.ruanchao.videoedit.base.BaseActivity;
+import com.ruanchao.videoedit.base.BaseMvpActivity;
 import com.ruanchao.videoedit.base.BaseViewHolder;
 import com.ruanchao.videoedit.bean.ToolItem;
+import com.ruanchao.videoedit.bean.VideoInfo;
+import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
-import com.ruanchao.videoedit.util.DensityUtil;
+import com.ruanchao.videoedit.util.Constans;
+import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FFmpegUtil;
+import com.wuhenzhizao.titlebar.statusbar.StatusBarUtils;
+import com.wuhenzhizao.titlebar.utils.ScreenUtils;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> implements View.OnClickListener,IMainView {
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "smallvideo";
     private static final String srcFile = PATH + File.separator + "hello.mp4";
     private static final String appendVideo = PATH + File.separator + "test.mp4";
     private static final String TAG = "MainActivity";
-    RecyclerView mMainRecycler;
-    DelegateAdapter mDelegateAdapter;
-    RecyclerView.RecycledViewPool mRecycledViewPool;
-    List<Integer> images = new ArrayList<>();
-    List<ToolItem> fastTools = new ArrayList<>();
-    List<ToolItem> allTools = new ArrayList<>();
+    private RecyclerView mMainRecycler;
+    private DelegateAdapter mDelegateAdapter;
+    private List<Integer> mImages = new ArrayList<>();
+    private List<ToolItem> mFastTools = new ArrayList<>();
+    private List<ToolItem> mAllTools = new ArrayList<>();
+    private List<VideoInfo> mVideoInfos;
+    private SubAdapter mVideoAdapter;
+    private double y;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        EventBus.getDefault().register(this);
         setContentView(R.layout.activity_main);
         Button mBtnTest = findViewById(R.id.btn_test);
         mBtnTest.setOnClickListener(this);
@@ -61,100 +78,66 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initRecycler();
     }
 
+    @Override
+    public MainPresenter createPresenter() {
+        return new MainPresenter(MainApplication.getContext());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void initRecycler() {
         mMainRecycler = findViewById(R.id.recycler_main);
-        VirtualLayoutManager virtualLayoutManager = new VirtualLayoutManager(this);
-        mMainRecycler.setLayoutManager(virtualLayoutManager);
-        mRecycledViewPool = new RecyclerView.RecycledViewPool();
-        mMainRecycler.setRecycledViewPool(mRecycledViewPool);
-        mRecycledViewPool.setMaxRecycledViews(0,20);
-        mDelegateAdapter = new DelegateAdapter(virtualLayoutManager,true);
-        mMainRecycler.setAdapter(mDelegateAdapter);
+        mDelegateAdapter = mPresenter.initRecyclerView(mMainRecycler);
         //banner
-        mDelegateAdapter.addAdapter(
-                new SubAdapter(this,new LinearLayoutHelper(), R.layout.main_banner_layout,1) {
+        SubAdapter bannerAdapter = mPresenter.initBannerAdapter(mImages);
+        mDelegateAdapter.addAdapter(bannerAdapter);
+        SubAdapter fastToolAdapter = mPresenter.initFastToolAdapter(mFastTools);
+        mDelegateAdapter.addAdapter(fastToolAdapter);
+        SubAdapter allToolAdapter = mPresenter.initAllToolAdapter(mAllTools);
+        mDelegateAdapter.addAdapter(allToolAdapter);
+        mDelegateAdapter.addAdapter(mPresenter.initVideoListTitleAdapter());
+        mVideoInfos = parseLiveVideoFile();
+        mVideoAdapter = mPresenter.initVideoListAdapter(mVideoInfos);
+        mDelegateAdapter.addAdapter(mVideoAdapter);
+        mDelegateAdapter.addAdapter(new SubAdapter(this,new LinearLayoutHelper(),
+                R.layout.edited_vidoe_layout,20,8));
 
-                    @Override
-                    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-                        super.onBindViewHolder(holder, position);
-                        Banner banner = ((BaseViewHolder) holder).getView(R.id.banner);
-                        //设置banner样式
-                        banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR)
-                                .setImageLoader(new GlideImageLoader())
-                                .setImages(images)
-                                //.setBannerAnimation(Transformer.DepthPage)
-                                .isAutoPlay(true)
-                                .setDelayTime(2000)
-                                .setIndicatorGravity(BannerConfig.CENTER)
-                                .start();
+        final double maxAlphaEffectHeight = 240.0;
+        final CommonTitleBar titleBar = findViewById(R.id.titlebar);
+        titleBar.setBackgroundColor(Color.parseColor("#00ffffff"));
+        mMainRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            String alphaHex;
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                y = y + dy;
+                if (y <= maxAlphaEffectHeight) {
+                    int alpha = (int) (y / maxAlphaEffectHeight * 255);
+                    alphaHex = Integer.toString(alpha, 16).toUpperCase();
+                    if (alphaHex.length() == 1) {
+                        alphaHex = "0" + alphaHex;
                     }
-                });
-        GridLayoutHelper fastToolGridLayoutHelper = new GridLayoutHelper(3);
-        mDelegateAdapter.addAdapter(
-                new SubAdapter(this, fastToolGridLayoutHelper,R.layout.gridview_fast_tool_item_layout,fastTools.size()){
-                    @Override
-                    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-                        super.onBindViewHolder(holder, position);
-                        TextView itemName = ((BaseViewHolder) holder).getView(R.id.tv_fast_tool_item);
-                        itemName.setText(fastTools.get(position).getItemName());
-                        ImageView itemIcon= ((BaseViewHolder) holder).getView(R.id.iv_fast_tool_item_icon);
-                        itemIcon.setImageResource(fastTools.get(position).getItemIcon());
-                        itemIcon.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onFastToolItemClick(position,v);
-                            }
-                        });
+                    setToolbarTransparent(alphaHex, titleBar);
+                }else {
+                    if (!"ff".equals(alphaHex)) {
+                        alphaHex = "ff";
+                        setToolbarTransparent(alphaHex, titleBar);
                     }
-                });
-
-        fastToolGridLayoutHelper.setBgColor(getColor(R.color.fast_tool_bg_color));
-        GridLayoutHelper allGridLayoutHelper = new GridLayoutHelper(4);
-
-        mDelegateAdapter.addAdapter(
-                new SubAdapter(this, allGridLayoutHelper,R.layout.gridview_fast_tool_item_layout,allTools.size()){
-                    @Override
-                    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-                        super.onBindViewHolder(holder, position);
-                        TextView itemName = ((BaseViewHolder) holder).getView(R.id.tv_fast_tool_item);
-                        itemName.setTextSize(12);
-                        holder.itemView.setBackgroundColor(Color.WHITE);
-                        itemName.setTextColor(Color.BLACK);
-                        itemName.setText(allTools.get(position).getItemName());
-                        ImageView itemIcon= ((BaseViewHolder) holder).getView(R.id.iv_fast_tool_item_icon);
-                        itemIcon.setImageResource(allTools.get(position).getItemIcon());
-                        itemIcon.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onAllToolItemClick(position,v);
-                                Toast.makeText(MainActivity.this,"当前快捷菜单："+ position, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                });
-        allGridLayoutHelper.setBgColor(getResources().getColor(R.color.all_tool_bg_color));
-        allGridLayoutHelper.setVGap(1);
-        allGridLayoutHelper.setHGap(1);
-
-        mDelegateAdapter.addAdapter(
-                new SubAdapter(this,new LinearLayoutHelper(0),R.layout.edited_vidoe_layout,1));
-
+                }
+            }
+        });
     }
 
-    private void onAllToolItemClick(int position, View v) {
-
-    }
-
-    private void onFastToolItemClick(int position, View v) {
-        switch (position){
-            //拍摄视频
-            case 0:
-                RecordActivity.startRecordActivity(MainActivity.this);
-                break;
-            default:
-                break;
-        }
+    private void setToolbarTransparent(String alphaHex, CommonTitleBar titleBar) {
+        String color = "#" + alphaHex + "03A9F4";
+        titleBar.setBackgroundColor(Color.parseColor(color));
+        String color2 = "#" + alphaHex + "ffffff";
+        titleBar.getCenterTextView().setTextColor(Color.parseColor(color2));
     }
 
     @Override
@@ -166,6 +149,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             default:
                 break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(EditFinishMsg editFinishMsg) {
+
+        Log.i(TAG,"onMessageEvent:" + editFinishMsg.getVideoInfo().getVideoName());
+        switch (editFinishMsg.getVideoInfo().getType()){
+            case VideoInfo.TYPE_VIDEO:
+                mVideoInfos.add(0, editFinishMsg.getVideoInfo());
+                mVideoAdapter.notifyDataSetChanged();
+
+                break;
+                default:
+                    break;
         }
     }
 
@@ -289,54 +287,109 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void initList() {
-        images.add(R.mipmap.banner1);
-        images.add(R.mipmap.banner2);
-        images.add(R.mipmap.banner3);
+        mImages.add(R.mipmap.banner1);
+        mImages.add(R.mipmap.banner2);
+        mImages.add(R.mipmap.banner3);
         ToolItem toolItem = new ToolItem();
         toolItem.setItemName("拍摄视频");
         toolItem.setItemIcon(R.mipmap.video_record);
-        fastTools.add(toolItem);
+        mFastTools.add(toolItem);
         ToolItem toolItem2 = new ToolItem();
         toolItem2.setItemName("编辑视频");
         toolItem2.setItemIcon(R.mipmap.edit_video);
-        fastTools.add(toolItem2);
+        mFastTools.add(toolItem2);
         ToolItem toolItem3 = new ToolItem();
         toolItem3.setItemName("裁剪视频");
         toolItem3.setItemIcon(R.mipmap.video_to_cut);
-        fastTools.add(toolItem3);
+        mFastTools.add(toolItem3);
 
         ToolItem toolItem4 = new ToolItem();
         toolItem4.setItemName("视频转gif");
         toolItem4.setItemIcon(R.mipmap.gif);
-        allTools.add(toolItem4);
+        mAllTools.add(toolItem4);
         ToolItem toolItem5 = new ToolItem();
         toolItem5.setItemName("格式转换");
         toolItem5.setItemIcon(R.mipmap.video_change);
-        allTools.add(toolItem5);
+        mAllTools.add(toolItem5);
         ToolItem toolItem6 = new ToolItem();
         toolItem6.setItemName("图片合视频");
         toolItem6.setItemIcon(R.mipmap.image_combine);
-        allTools.add(toolItem6);
+        mAllTools.add(toolItem6);
         ToolItem toolItem7 = new ToolItem();
         toolItem7.setItemName("加水印");
         toolItem7.setItemIcon(R.mipmap.video_water);
-        allTools.add(toolItem7);
+        mAllTools.add(toolItem7);
         ToolItem toolItem8 = new ToolItem();
         toolItem8.setItemName("提取音频");
         toolItem8.setItemIcon(R.mipmap.audio);
-        allTools.add(toolItem8);
+        mAllTools.add(toolItem8);
         ToolItem toolItem9 = new ToolItem();
         toolItem9.setItemName("加背景音乐");
         toolItem9.setItemIcon(R.mipmap.bg_audio);
-        allTools.add(toolItem9);
+        mAllTools.add(toolItem9);
         ToolItem toolItem10 = new ToolItem();
         toolItem10.setItemName("视频压缩");
         toolItem10.setItemIcon(R.mipmap.video_press);
-        allTools.add(toolItem10);
+        mAllTools.add(toolItem10);
         ToolItem toolItem11 = new ToolItem();
         toolItem11.setItemName("更多");
         toolItem11.setItemIcon(R.mipmap.more_tools);
-        allTools.add(toolItem11);
+        mAllTools.add(toolItem11);
     }
 
+    private List<VideoInfo> parseLiveVideoFile() {
+        File file = new File(Constans.VIDEO_PATH);
+        if (!file.isDirectory()){
+            return null;
+        }
+        File[] videoFiles = file.listFiles();
+        List<VideoInfo> list = new ArrayList<>();
+        for (File videoFile : videoFiles){
+            if(videoFile.exists() && videoFile.getName().endsWith(".mp4")){
+                VideoInfo liveVideoInfo = new VideoInfo();
+                liveVideoInfo.setVideoPath(videoFile.getAbsolutePath());
+                liveVideoInfo.setVideoName(videoFile.getName());
+                liveVideoInfo.setVideoTime(videoFile.lastModified());
+                liveVideoInfo.setVideoTitle(DateUtil.timeToDate(videoFile.lastModified()));
+                list.add(liveVideoInfo);
+            }
+        }
+        Collections.sort(list);
+        return list;
+    }
+
+    @Override
+    public void onFastToolItemClick(int position, View v) {
+        switch (position){
+            //拍摄视频
+            case 0:
+                RecordActivity.startRecordActivity(MainActivity.this);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onAllToolItemClick(int position, View v) {
+        Toast.makeText(MainActivity.this,"当前快捷菜单："+ position, Toast.LENGTH_LONG).show();
+        switch (position){
+            //视频转gif
+            case 0:
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void showToast(String msg) {
+
+    }
+
+    @Override
+    public void showErr() {
+
+    }
 }

@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <VideoView
         android:id="@+id/videoView"
@@ -59,13 +58,17 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00ffffff"
-        android:theme="@style/VideoEditToolbarTheme"
-        app:navigationIcon="@mipmap/back"
-        app:title="视频编辑"
-        app:titleTextColor="#ffffff"></android.support.v7.widget.Toolbar>
+        titlebar:leftType="textView"
+        titlebar:rightType="imageButton"
+        titlebar:titleBarColor="#00ffffff"
+        titlebar:showBottomLine="false"
+        titlebar:leftDrawable="@mipmap/back"
+        titlebar:leftText="视频编辑"
+        titlebar:leftTextColor="#ffffff"
+        titlebar:rightImageResource="@mipmap/finish_icon" />
 </RelativeLayout>

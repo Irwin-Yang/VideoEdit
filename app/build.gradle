@@ -21,6 +21,8 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            aaptOptions.cruncherEnabled = false
+            aaptOptions.useNewCruncher = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -38,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
@@ -53,9 +55,14 @@ dependencies {
     api 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     api 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     api 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
-    api ('com.alibaba.android:vlayout:1.2.8@aar') {
+    api('com.alibaba.android:vlayout:1.2.8@aar') {
         transitive = true
     }
-    api 'com.youth.banner:banner:1.4.10'  //最新版本
-    api "com.jph.takephoto:takephoto_library:4.0.3"
+    api 'com.youth.banner:banner:1.4.10'
+    //最新版本
+    api 'com.jph.takephoto:takephoto_library:4.0.3'
+    api 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation files('libs/pinyin4j-2.5.0.jar')
+    implementation 'com.wuhenzhizao:titlebar:1.1.3'
 }

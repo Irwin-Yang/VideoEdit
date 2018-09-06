@@ -29,4 +29,7 @@ public class Constans {
     public static final String VIDEO_PREF = "video_pref";
 
     public static final String IS_LOADED_RESOURCE = "is_loaded_resource";
+
+    public static final int TYPE_VIDEO_EDIT = 1;
+
 }

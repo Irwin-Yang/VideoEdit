@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="增加水印"
+        android:text="增加背景音乐"
         android:textColor="@color/fast_tool_bg_color"
         android:textSize="20sp"
         android:layout_marginBottom="20dp"
@@ -23,22 +23,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择水印图片"
+            android:text="选择背景音乐"
             android:textSize="16sp"
             android:textColor="#000000"
             />
         <Button
-            android:id="@+id/btn_inner_choose"
+            android:id="@+id/btn_inner_music"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="内置水印"
+            android:text="内置音乐"
             android:textSize="16sp"
             />
         <Button
-            android:id="@+id/btn_photos_choose"
+            android:id="@+id/btn_phone_music"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="相册"
+            android:text="手机音乐"
             android:textSize="16sp"
             />
         <TextView
@@ -46,14 +46,14 @@
             android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="请选择图片"
+            android:text="请选择音乐"
             android:textSize="14sp"
             android:textColor="#de5347"
             />
 
     </LinearLayout>
     <TextView
-        android:id="@+id/tv_image_path"
+        android:id="@+id/tv_music_path"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
@@ -68,7 +68,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="水印开始时间:"
+            android:text="音乐起始时间:"
             android:textSize="16sp"
             android:textColor="#000000"
             />
@@ -79,7 +79,7 @@
             android:gravity="center"
             android:textSize="16sp"
             android:textColor="#000000"
-            android:text="0"/>
+            android:text="10"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,61 +87,6 @@
             android:textSize="16sp"
             android:textColor="#000000"
             />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="水印结束时间:"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            />
-        <EditText
-            android:id="@+id/tv_end_time"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:hint="10"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="秒"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="水印位置:"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            />
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical" >
-
-            <Spinner
-                android:id="@+id/sp_water_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/water_location"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                />
-        </LinearLayout>
     </LinearLayout>
     <Button
         android:id="@+id/submit_edit"

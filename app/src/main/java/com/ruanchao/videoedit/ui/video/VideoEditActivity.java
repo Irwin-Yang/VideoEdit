@@ -1,18 +1,19 @@
-package com.ruanchao.videoedit.activity;
+package com.ruanchao.videoedit.ui.video;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,71 +28,55 @@ import com.jph.takephoto.model.TResult;
 import com.jph.takephoto.permission.InvokeListener;
 import com.jph.takephoto.permission.PermissionManager;
 import com.jph.takephoto.permission.TakePhotoInvocationHandler;
+import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
+import com.ruanchao.videoedit.base.BaseMvpActivity;
+import com.ruanchao.videoedit.bean.Music;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.bean.WaterInfo;
-import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
+import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.util.Constans;
-import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.AddWaterView;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.io.IOException;
 
-import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class VideoPlayActivity extends BaseActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener, InvokeListener {
+public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditPresenter> implements View.OnClickListener, IVideoEditView, InvokeListener {
 
     private static final String VIDEO_PATH = "video_path";
-    private static final int WHAT_ADD_DANMU = 100;
-    private static final String TAG = VideoPlayActivity.class.getSimpleName();
-    Toolbar toolbar;
-    TextView mAddBgm;
-    TextView mAddWatermark;
-    TextView mAddDrawText;
-    String mInputVideo;
-    String mInputBgm;
-    String mInputLogo;
-    long mOutFileTime = System.currentTimeMillis();
-    String mOutFileName = mOutFileTime + ".mp4";
-    String mTempOutPath = Constans.VIDEO_TEMP_PATH + mOutFileName;
-    String mOutPath = Constans.VIDEO_PATH + File.separator + mOutFileName;
-    long mDuration;//时长(毫秒)
-    ProgressDialog mProgressDialog;
-    Toast mToast;
-    int mVideoWidth;
-    int mVideoHeight;
+    private static final String TAG = VideoEditActivity.class.getSimpleName();
+    private CommonTitleBar toolbar;
+    private TextView mAddBgm;
+    private TextView mAddWatermark;
+    private TextView mAddDrawText;
+    private ProgressDialog mProgressDialog;
+    private Toast mToast;
+    private VideoInfo mInputVideoInfo;
     private BottomSheetDialog mBottomSheetDialog;
     private WaterInfo mWaterInfo;
-    boolean hasBgMusic = true;
-    boolean hasSubtitle = true;
+    private Music mMusic;
     private TakePhoto takePhoto;
     private InvokeParam invokeParam;
     private Uri imageUri;
     private AddWaterView mAddWaterView;
+    private String mMusicPath;
 
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what){
-                case WHAT_ADD_DANMU:
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
+    private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getTakePhoto().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
         init();
+    }
+
+    @Override
+    public VideoEditPresenter createPresenter() {
+        return new VideoEditPresenter(MainApplication.getContext());
     }
 
     @Override
@@ -104,6 +89,13 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         getTakePhoto().onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode){
+            case MusicListActivity.REQUEST_CODE:
+                mMusicPath = data.getStringExtra(MusicListActivity.MUSIC_PATH);
+                break;
+                default:
+                    break;
+        }
     }
 
     @Override
@@ -113,13 +105,22 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void init() {
+        mBottomSheetDialog = new BottomSheetDialog(this);
         mToast = Toast.makeText(this,"", Toast.LENGTH_LONG);
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.inflateMenu(R.menu.video_edit_menu);
-        toolbar.setOnMenuItemClickListener(this);
+        toolbar = findViewById(R.id.titlebar);
+        toolbar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_TEXT) {
+                    finish();
+                }else if (action == CommonTitleBar.ACTION_RIGHT_BUTTON){
+                    recordFinish();
+                }
+            }
+        });
         VideoView mVideoView = (VideoView) findViewById(R.id.videoView);
         mVideoView.setMediaController(new MediaController(this));
-        mInputVideo = getIntent().getStringExtra(VIDEO_PATH);
+        String mInputVideo = getIntent().getStringExtra(VIDEO_PATH);
         Uri videoUri = Uri.parse(mInputVideo);
         mVideoView.setVideoURI(videoUri);
         mVideoView.start();
@@ -129,13 +130,50 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
         mAddWatermark.setOnClickListener(this);
         mAddDrawText = findViewById(R.id.tv_add_draw_text);
         mAddDrawText.setOnClickListener(this);
-        getMediaInfo();
+        mInputVideoInfo = new VideoInfo();
+        mInputVideoInfo.setVideoPath(mInputVideo);
+        mInputVideoInfo = mPresenter.getMediaInfo(mInputVideoInfo);
     }
 
+    private void recordFinish() {
+        mPresenter.doEditVideo(mInputVideoInfo,mWaterInfo,mMusic,new Subscriber<VideoInfo>() {
+            @Override
+            public void onStart() {
+                super.onStart();
+                showProgressDialog("提示","视频编辑中，请稍后。。。");
+            }
 
+            @Override
+            public void onCompleted() {
+                if (mProgressDialog != null){
+                    mProgressDialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(VideoEditActivity.this,"执行失败", Toast.LENGTH_LONG).show();
+                if (mProgressDialog != null){
+                    mProgressDialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onNext(VideoInfo videoInfo) {
+                Toast.makeText(VideoEditActivity.this,"执行结束", Toast.LENGTH_LONG).show();
+                if (videoInfo != null) {
+                    //EventBus.getDefault().post(new FinishVideoMsgEvent(videoInfo));
+                    mToast.setText("视频保存在：" + videoInfo.getVideoPath());
+                    mToast.show();
+                }
+                EventBus.getDefault().post(new EditFinishMsg(videoInfo));
+                finish();
+            }
+        });
+    }
 
     public static void start(Context context, String videoPath){
-        Intent intent = new Intent(context, VideoPlayActivity.class);
+        Intent intent = new Intent(context, VideoEditActivity.class);
         intent.putExtra(VIDEO_PATH,videoPath);
         context.startActivity(intent);
     }
@@ -144,10 +182,9 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_add_bgm:
-                mInputBgm = Constans.VIDEO_SOURCE_PATH + "bg1.mp3";
+                showAddBgMusic();
                 break;
             case R.id.tv_add_watermark:
-                mInputLogo = Constans.VIDEO_SOURCE_PATH + "icon1.png";
                 showAddWater();
                 break;
             case R.id.tv_add_draw_text:
@@ -155,6 +192,36 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
                 default:
                     break;
         }
+    }
+
+    private void showAddBgMusic() {
+        View view = LayoutInflater.from(VideoEditActivity.this).inflate(R.layout.add_bg_music_layout, null);
+        Button mPhoneMusic = view.findViewById(R.id.btn_phone_music);
+        mPhoneMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicListActivity.startActivityForResult(VideoEditActivity.this,MusicListActivity.REQUEST_CODE);
+            }
+        });
+        Button mSubmitMusic = view.findViewById(R.id.submit_edit);
+        final TextView startTimeView = view.findViewById(R.id.tv_start_time);
+        mSubmitMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (TextUtils.isEmpty(mMusicPath)){
+                    Toast.makeText(VideoEditActivity.this,"请先选择背景音乐",Toast.LENGTH_LONG).show();
+                }else {
+                    mMusic = new Music();
+                    mMusic.setPath(mMusicPath);
+                    mMusic.setMusicStartTime(startTimeView.getText().toString());
+                    mAddBgm.setBackground(getResources().getDrawable(R.drawable.edit_bg_shape_click));
+                    mBottomSheetDialog.dismiss();
+                }
+            }
+        });
+        mBottomSheetDialog.setContentView(view);
+        mBottomSheetDialog.show();
     }
 
     /**
@@ -168,112 +235,13 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
         return takePhoto;
     }
 
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId() == R.id.action_success){
-            doEditVideo();
-        }
-        return true;
-    }
-
-    private void doEditVideo() {
-
-        Observable.create(new Observable.OnSubscribe<VideoInfo>() {
-            @Override
-            public void call(Subscriber<? super VideoInfo> subscriber) {
-                int result = ffmpegEditVideo();
-               //移到视频文件夹
-                VideoInfo videoInfo = null;
-                if (result == 0 && FileUtil.moveFile(mTempOutPath, Constans.VIDEO_PATH)){
-                    videoInfo = new VideoInfo();
-                    videoInfo.setVideoPath(mOutPath);
-                    videoInfo.setVideoTime(mOutFileTime);
-                    videoInfo.setVideoTitle(mOutFileName);
-                }
-                subscriber.onNext(videoInfo);
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<VideoInfo>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                        showProgressDialog("提示","视频编辑中，请稍后。。。");
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        if (mProgressDialog != null){
-                            mProgressDialog.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(VideoPlayActivity.this,"执行失败", Toast.LENGTH_LONG).show();
-                        if (mProgressDialog != null){
-                            mProgressDialog.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(VideoInfo videoInfo) {
-                        Toast.makeText(VideoPlayActivity.this,"执行结束", Toast.LENGTH_LONG).show();
-                        if (videoInfo != null) {
-                            //EventBus.getDefault().post(new FinishVideoMsgEvent(videoInfo));
-                            mToast.setText("视频保存在：" + mOutPath);
-                            mToast.show();
-                        }
-                        finish();
-                    }
-                });
-
-    }
-
-    private void getMediaInfo() {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(mInputVideo);
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mDuration = mediaPlayer.getDuration();
-        mVideoWidth = mediaPlayer.getVideoWidth();
-        mVideoHeight = mediaPlayer.getVideoHeight();
-    }
-
-    private int ffmpegEditVideo() {
-
-        StringBuffer sb = new StringBuffer();
-        sb.append(String.format("ffmpeg -y -i %s ",mInputVideo));
-        String cmd = null;
-        if (mWaterInfo != null) {
-
-             cmd = String.format(" -i %s -filter_complex [1:v]scale=90:-1[img1];[0:v][img1]overlay='%s':%s",
-                     mWaterInfo.getWaterPath(),
-                     mWaterInfo.getxPosition(),
-                     mWaterInfo.getyPosition());
-            Log.i(TAG,"cmd:" + cmd);
-        }
-
-        sb.append(String.format("  -b:v 1000k %s",mTempOutPath));
-        if (cmd != null) {
-            return FFmpegCmd.execute(sb.toString());
-        }
-        return -1;
-    }
-
     private void showProgressDialog(String title, String msg){
         mProgressDialog = ProgressDialog.show(this, title, msg, false, false);
     }
 
     public void showAddWater() {
-        mBottomSheetDialog = new BottomSheetDialog(this);
-        mAddWaterView = new AddWaterView(VideoPlayActivity.this);
-        mAddWaterView.setDefaultEndTime(mDuration);
+        mAddWaterView = new AddWaterView(VideoEditActivity.this);
+        mAddWaterView.setDefaultEndTime(mInputVideoInfo.getDuration());
         mAddWaterView.setOnSubmitListener(new AddWaterView.OnSubmitListener() {
             @Override
             public void onSubmit(WaterInfo waterInfo) {
@@ -358,5 +326,13 @@ public class VideoPlayActivity extends BaseActivity implements View.OnClickListe
         return cropOptions;
     }
 
+    @Override
+    public void showToast(String msg) {
 
+    }
+
+    @Override
+    public void showErr() {
+
+    }
 }

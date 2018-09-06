@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:fitsSystemWindows="false"
+    tools:context=".ui.video.MainActivity">
     <Button
         android:visibility="gone"
         android:id="@+id/btn_test"
@@ -19,5 +20,17 @@
         android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
+
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        titlebar:titleBarColor="#00ffffff"
+        titlebar:showBottomLine="false"
+        titlebar:statusBarMode="dark"
+        titlebar:centerText="视频编辑器"
+        titlebar:centerTextColor="#00ffffff"
+        titlebar:centerType="textView" />
 
 </RelativeLayout>
