@@ -10,7 +10,13 @@
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:layout_width="wrap_content"
-        android:layout_height="115dp" />
+        android:layout_height="@dimen/edit_video_height" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/video_play_icon2"
+        android:layout_centerInParent="true"
+        />
 
     <TextView
         android:id="@+id/tv_video_title"

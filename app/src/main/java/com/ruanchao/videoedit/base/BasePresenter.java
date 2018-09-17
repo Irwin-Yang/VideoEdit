@@ -11,7 +11,7 @@ import rx.subscriptions.CompositeSubscription;
 public class BasePresenter<T extends IBaseView> {
 
     protected WeakReference<T> viewRef;
-    protected CompositeSubscription mSubscriptions;
+    protected CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     /**
      * 绑定view，一般在初始化中调用该方法

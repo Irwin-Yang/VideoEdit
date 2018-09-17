@@ -1,6 +1,7 @@
 package com.ruanchao.videoedit.base;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 

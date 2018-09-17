@@ -16,6 +16,7 @@ android {
         }
         ndk {
             abiFilters "armeabi-v7a"
+            ldLibs "log", "z", "m"
         }
     }
     buildTypes {

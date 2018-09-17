@@ -24,7 +24,9 @@ import android.widget.Toast;
 
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.base.BaseActivity;
+import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.util.Constans;
+import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.BothWayProgressBar;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
@@ -57,6 +59,8 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
     private boolean isRecording;
     //段视频保存的目录
     private File mTargetFile;
+    private long mVideoTime = System.currentTimeMillis();
+    private String mVideoName = mVideoTime + ".mp4";
     //当前进度/时间
     private int mProgress;
     //录制最大时间
@@ -267,8 +271,7 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
                 if (targetDir.exists()) {
                     FileUtil.deleteFile(targetDir);
                 }
-                mTargetFile = new File(targetDir,
-                        System.currentTimeMillis() + ".mp4");
+                mTargetFile = new File(targetDir, mVideoName);
                 if (!targetDir.exists()){
                     targetDir.mkdirs();
                 }
@@ -346,7 +349,13 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
             Toast.makeText(this,"请先拍摄视频",Toast.LENGTH_LONG).show();
             return;
         }
-        VideoEditActivity.start(this,mTargetFile.getAbsolutePath());
+        VideoInfo videoInfo = new VideoInfo();
+        videoInfo.setVideoPath(mTargetFile.getAbsolutePath());
+        videoInfo.setType(VideoInfo.TYPE_VIDEO);
+        videoInfo.setVideoTitle(DateUtil.timeToDate(mVideoTime));
+        videoInfo.setVideoName(mVideoName);
+        videoInfo.setVideoTime(mVideoTime);
+        VideoEditActivity.start(this,videoInfo);
         finish();
     }
 

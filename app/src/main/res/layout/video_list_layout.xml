@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <ImageView
+        android:id="@+id/iv_no_edit_video"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_video_height"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:src="@mipmap/no_edit_video"/>
+    <GridView
+        android:id="@+id/gv_video_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        ></GridView>
+
+</RelativeLayout>

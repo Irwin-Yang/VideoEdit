@@ -42,4 +42,8 @@ public class FFmpegCmd {
     }
     private native static int handle(String[] commands);
 
+    public native static String getVideoInfo(String videoPath);
+
+    public native static long getVideoDuration(String videoPath);
+
 }

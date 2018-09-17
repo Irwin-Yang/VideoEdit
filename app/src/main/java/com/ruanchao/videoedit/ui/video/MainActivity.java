@@ -1,46 +1,32 @@
 package com.ruanchao.videoedit.ui.video;
 
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.vlayout.DelegateAdapter;
-import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
-import com.bumptech.glide.Glide;
 import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
-import com.ruanchao.videoedit.adapter.GlideImageLoader;
 import com.ruanchao.videoedit.adapter.SubAdapter;
-import com.ruanchao.videoedit.base.BaseActivity;
 import com.ruanchao.videoedit.base.BaseMvpActivity;
-import com.ruanchao.videoedit.base.BaseViewHolder;
+import com.ruanchao.videoedit.bean.EditInfo;
 import com.ruanchao.videoedit.bean.ToolItem;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
+import com.ruanchao.videoedit.ui.tools.VideoEditToolActivity;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FFmpegUtil;
-import com.wuhenzhizao.titlebar.statusbar.StatusBarUtils;
-import com.wuhenzhizao.titlebar.utils.ScreenUtils;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
-import com.youth.banner.Banner;
-import com.youth.banner.BannerConfig;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,6 +36,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.ruanchao.videoedit.ui.video.MainPresenter.VIDEO_LIST_TITLE_TYPE;
 
 public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> implements View.OnClickListener,IMainView {
 
@@ -104,12 +92,17 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         mVideoInfos = parseLiveVideoFile();
         mVideoAdapter = mPresenter.initVideoListAdapter(mVideoInfos);
         mDelegateAdapter.addAdapter(mVideoAdapter);
+        mDelegateAdapter.addAdapter(mPresenter.initMaterialTitleAdapter(MainPresenter.VIDEO_BOX_TYPE));
+        mDelegateAdapter.addAdapter(mPresenter.initMaterialAdapter(MainPresenter.VIDEO_BOX_TYPE));
+        mDelegateAdapter.addAdapter(mPresenter.initMaterialTitleAdapter(MainPresenter.MATERIAL_TYPE));
+        mDelegateAdapter.addAdapter(mPresenter.initMaterialAdapter(MainPresenter.MATERIAL_TYPE));
         mDelegateAdapter.addAdapter(new SubAdapter(this,new LinearLayoutHelper(),
-                R.layout.edited_vidoe_layout,20,8));
+                R.layout.edited_main_title_layout,20,8));
 
         final double maxAlphaEffectHeight = 240.0;
         final CommonTitleBar titleBar = findViewById(R.id.titlebar);
         titleBar.setBackgroundColor(Color.parseColor("#00ffffff"));
+        titleBar.toggleStatusBarMode();
         mMainRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             String alphaHex;
             @Override
@@ -155,11 +148,10 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EditFinishMsg editFinishMsg) {
 
-        Log.i(TAG,"onMessageEvent:" + editFinishMsg.getVideoInfo().getVideoName());
         switch (editFinishMsg.getVideoInfo().getType()){
             case VideoInfo.TYPE_VIDEO:
                 mVideoInfos.add(0, editFinishMsg.getVideoInfo());
-                mVideoAdapter.notifyDataSetChanged();
+                mPresenter.getVideoGridAdapter().notifyDataSetChanged();
 
                 break;
                 default:
@@ -365,6 +357,9 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
             case 0:
                 RecordActivity.startRecordActivity(MainActivity.this);
                 break;
+            case 1:
+                VideoEditActivity.start(this,null);
+                break;
             default:
                 break;
         }
@@ -372,11 +367,10 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
 
     @Override
     public void onAllToolItemClick(int position, View v) {
-        Toast.makeText(MainActivity.this,"当前快捷菜单："+ position, Toast.LENGTH_LONG).show();
         switch (position){
             //视频转gif
             case 0:
-
+                VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_VIDEO_TO_GIF);
                 break;
             default:
                 break;

@@ -3,17 +3,17 @@ package com.ruanchao.videoedit.ui.video;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,25 +35,28 @@ import com.ruanchao.videoedit.bean.Music;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.bean.WaterInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
+import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.util.Constans;
+import com.ruanchao.videoedit.util.DateUtil;
+import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.AddWaterView;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
+import java.io.Serializable;
 
 import rx.Subscriber;
 
-public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditPresenter> implements View.OnClickListener, IVideoEditView, InvokeListener {
+public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditPresenter> implements View.OnClickListener, IVideoEditView, InvokeListener, MediaPlayer.OnCompletionListener {
 
-    private static final String VIDEO_PATH = "video_path";
+    private static final String VIDEO_INFO = "video_info";
     private static final String TAG = VideoEditActivity.class.getSimpleName();
     private CommonTitleBar toolbar;
     private TextView mAddBgm;
     private TextView mAddWatermark;
     private TextView mAddDrawText;
-    private ProgressDialog mProgressDialog;
     private Toast mToast;
     private VideoInfo mInputVideoInfo;
     private BottomSheetDialog mBottomSheetDialog;
@@ -64,13 +67,19 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     private Uri imageUri;
     private AddWaterView mAddWaterView;
     private String mMusicPath;
+    private View mShadeView;
+    private Button mChooseVideo;
+    private VideoView mVideoView;
+    ImageView mVideoPlayView;
+    public static final int REQUEST_CODE = 100;
+    private static final int CHOOSE_VIDEO_CODE = 101;
 
     private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getTakePhoto().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_play);
+        setContentView(R.layout.activity_video_edit);
         init();
     }
 
@@ -86,12 +95,33 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        startVideo();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         getTakePhoto().onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode){
-            case MusicListActivity.REQUEST_CODE:
+        switch (requestCode){
+            case REQUEST_CODE:
                 mMusicPath = data.getStringExtra(MusicListActivity.MUSIC_PATH);
+                break;
+            case CHOOSE_VIDEO_CODE:
+                Uri uri = data.getData();
+                mVideoView.setVideoURI(uri);
+                startVideo();
+                mShadeView.setVisibility(View.GONE);
+                toolbar.getRightImageButton().setVisibility(View.VISIBLE);
+                String path = FileUtil.getFilePathByUri(this, uri);
+                File file = new File(path);
+                mInputVideoInfo = new VideoInfo();
+                mInputVideoInfo.setVideoPath(path);
+                mInputVideoInfo.setVideoName(file.getName());
+                mInputVideoInfo.setVideoTime(file.lastModified());
+                mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
+                setVideoInfo();
                 break;
                 default:
                     break;
@@ -118,12 +148,11 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 }
             }
         });
-        VideoView mVideoView = (VideoView) findViewById(R.id.videoView);
-        mVideoView.setMediaController(new MediaController(this));
-        String mInputVideo = getIntent().getStringExtra(VIDEO_PATH);
-        Uri videoUri = Uri.parse(mInputVideo);
-        mVideoView.setVideoURI(videoUri);
-        mVideoView.start();
+        mVideoView = (VideoView) findViewById(R.id.videoView);
+        MediaController mediaController = new MediaController(this);
+        mediaController.setVisibility(View.GONE);        //隐藏进度条
+        mVideoView.setMediaController(mediaController);
+        mVideoView.setOnCompletionListener(this);
         mAddBgm = findViewById(R.id.tv_add_bgm);
         mAddBgm.setOnClickListener(this);
         mAddWatermark = findViewById(R.id.tv_add_watermark);
@@ -131,8 +160,32 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         mAddDrawText = findViewById(R.id.tv_add_draw_text);
         mAddDrawText.setOnClickListener(this);
         mInputVideoInfo = new VideoInfo();
-        mInputVideoInfo.setVideoPath(mInputVideo);
-        mInputVideoInfo = mPresenter.getMediaInfo(mInputVideoInfo);
+        mShadeView = findViewById(R.id.ll_shade_view);
+        mChooseVideo = findViewById(R.id.btn_choose_video);
+        mChooseVideo.setOnClickListener(this);
+        mVideoPlayView = findViewById(R.id.iv_video_play);
+        mVideoPlayView.setOnClickListener(this);
+        Serializable videoInfoSer = getIntent().getSerializableExtra(VIDEO_INFO);
+        if (videoInfoSer == null){
+            toolbar.getRightImageButton().setVisibility(View.GONE);
+        }else {
+            mInputVideoInfo = (VideoInfo) videoInfoSer;
+            setVideoInfo();
+        }
+    }
+
+    private void setVideoInfo() {
+        mShadeView.setVisibility(View.GONE);
+        toolbar.getRightImageButton().setVisibility(View.VISIBLE);
+        Uri videoUri = Uri.parse(mInputVideoInfo.getVideoPath());
+        mVideoView.setVideoURI(videoUri);
+        startVideo();
+        mInputVideoInfo.setDuration(FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath()));
+    }
+
+    private void startVideo(){
+        mVideoPlayView.setVisibility(View.GONE);
+        mVideoView.start();
     }
 
     private void recordFinish() {
@@ -162,9 +215,14 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
             public void onNext(VideoInfo videoInfo) {
                 Toast.makeText(VideoEditActivity.this,"执行结束", Toast.LENGTH_LONG).show();
                 if (videoInfo != null) {
-                    //EventBus.getDefault().post(new FinishVideoMsgEvent(videoInfo));
-                    mToast.setText("视频保存在：" + videoInfo.getVideoPath());
-                    mToast.show();
+                    if (videoInfo.isEditSuccess()) {
+                        //EventBus.getDefault().post(new FinishVideoMsgEvent(videoInfo));
+                        mToast.setText("视频保存在：" + videoInfo.getVideoPath());
+                        mToast.show();
+                    }else {
+                        mToast.setText("视频编辑失败，原始视频保存在：" + videoInfo.getVideoPath());
+                        mToast.show();
+                    }
                 }
                 EventBus.getDefault().post(new EditFinishMsg(videoInfo));
                 finish();
@@ -172,9 +230,9 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         });
     }
 
-    public static void start(Context context, String videoPath){
+    public static void start(Context context, VideoInfo videoInfo){
         Intent intent = new Intent(context, VideoEditActivity.class);
-        intent.putExtra(VIDEO_PATH,videoPath);
+        intent.putExtra(VIDEO_INFO,videoInfo);
         context.startActivity(intent);
     }
 
@@ -189,6 +247,15 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 break;
             case R.id.tv_add_draw_text:
                 break;
+            case R.id.btn_choose_video:
+                Intent intent = new Intent();
+                intent.setType("video/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent, CHOOSE_VIDEO_CODE);
+                break;
+            case R.id.iv_video_play:
+                startVideo();
+                break;
                 default:
                     break;
         }
@@ -200,7 +267,7 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         mPhoneMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MusicListActivity.startActivityForResult(VideoEditActivity.this,MusicListActivity.REQUEST_CODE);
+                MusicListActivity.startActivityForResult(VideoEditActivity.this, REQUEST_CODE);
             }
         });
         Button mSubmitMusic = view.findViewById(R.id.submit_edit);
@@ -235,9 +302,7 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         return takePhoto;
     }
 
-    private void showProgressDialog(String title, String msg){
-        mProgressDialog = ProgressDialog.show(this, title, msg, false, false);
-    }
+
 
     public void showAddWater() {
         mAddWaterView = new AddWaterView(VideoEditActivity.this);
@@ -335,4 +400,11 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     public void showErr() {
 
     }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+
+        mVideoPlayView.setVisibility(View.VISIBLE);
+    }
+
 }

@@ -1,6 +1,9 @@
 package com.ruanchao.videoedit.util;
 
 import android.content.Context;
+import android.view.WindowManager;
+
+import com.ruanchao.videoedit.MainApplication;
 
 /**
  * Created by ruanchao on 2018/5/4.
@@ -45,5 +48,12 @@ public class DensityUtil {
     public static int sp2px(Context context, int spValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
+    }
+
+    public static int getWindowWidth(){
+        WindowManager wm = (WindowManager) MainApplication.getContext()
+                .getSystemService(Context.WINDOW_SERVICE);
+        int width = wm.getDefaultDisplay().getWidth();
+        return width;
     }
 }

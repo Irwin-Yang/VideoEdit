@@ -6,10 +6,17 @@
     android:layout_height="match_parent"
     android:background="#000000"
     tools:context=".ui.video.VideoShowActivity">
-    <VideoView
-        android:id="@+id/videoView"
+    <LinearLayout
+        android:id="@+id/ll_video_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.ruanchao.videoedit.view.FullScreenVideoView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
     <com.wuhenzhizao.titlebar.widget.CommonTitleBar
         xmlns:titlebar="http://schemas.android.com/apk/res-auto"
         android:id="@+id/titlebar"

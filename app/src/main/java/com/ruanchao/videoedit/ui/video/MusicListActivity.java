@@ -35,7 +35,6 @@ import rx.schedulers.Schedulers;
 
 public class MusicListActivity extends Activity {
 
-    public static final int REQUEST_CODE = 100;
     private static final String TAG = MusicListActivity.class.getSimpleName();
     RecyclerView mMusicRecycler;
     List<Music> mMusicList = new ArrayList<>();
@@ -82,7 +81,7 @@ public class MusicListActivity extends Activity {
                     public void onClick(View v) {
                         String path = mMusicList.get(position).getPath();
                         Intent intent = getIntent().putExtra(MUSIC_PATH,path);
-                        setResult(MusicListActivity.REQUEST_CODE, intent);
+                        setResult(VideoEditActivity.REQUEST_CODE, intent);
                         finish();
                     }
                 });

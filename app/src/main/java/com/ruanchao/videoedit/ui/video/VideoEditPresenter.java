@@ -34,25 +34,33 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
 
     public VideoEditPresenter(Application context) {
         this.context = context;
-        mSubscriptions = new CompositeSubscription();
     }
 
     public void doEditVideo(final VideoInfo inputVideoInfo, final WaterInfo waterInfo, final Music bgMusicInfo, Subscriber<VideoInfo> subscriber) {
         mSubscriptions.add(Observable.create(new Observable.OnSubscribe<VideoInfo>() {
             @Override
             public void call(Subscriber<? super VideoInfo> subscriber) {
-                int result = ffmpegEditVideo(inputVideoInfo,waterInfo,bgMusicInfo);
+                int result = -1;
+                try {
+                    result = ffmpegEditVideo(inputVideoInfo,waterInfo,bgMusicInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 //移到视频文件夹
-                VideoInfo videoInfo = null;
                 if (result == 0 && FileUtil.moveFile(mTempOutPath, Constans.VIDEO_PATH)){
-                    videoInfo = new VideoInfo();
+                    VideoInfo videoInfo = new VideoInfo();
                     videoInfo.setVideoPath(mOutPath);
                     videoInfo.setVideoTime(mOutFileTime);
                     videoInfo.setVideoName(mOutFileName);
                     videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));
+                    videoInfo.setEditSuccess(true);
                     videoInfo.setType(VideoInfo.TYPE_VIDEO);
+                    subscriber.onNext(videoInfo);
+                }else {
+                    FileUtil.moveFile(inputVideoInfo.getVideoPath(), Constans.VIDEO_PATH);
+                    inputVideoInfo.setEditSuccess(false);
+                    subscriber.onNext(inputVideoInfo);
                 }
-                subscriber.onNext(videoInfo);
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io())
@@ -61,16 +69,31 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
 
     }
 
-    private int ffmpegEditVideo(VideoInfo inputVideoInfo, WaterInfo mWaterInfo,Music bgMusicInfo) {
+    private int ffmpegEditVideo(VideoInfo inputVideoInfo, WaterInfo mWaterInfo,Music bgMusicInfo) throws Exception{
         String mInputVideo = inputVideoInfo.getVideoPath();
         StringBuffer sb = new StringBuffer();
         sb.append(String.format("ffmpeg -y -i %s ",mInputVideo));
+        //控制视频最大时长为20s,避免视频过大耗时
+        double editVideoDuration = inputVideoInfo.getDuration() >20 ? 20:inputVideoInfo.getDuration();
+
         if (bgMusicInfo != null && mWaterInfo != null){
 
-        } else if (bgMusicInfo != null){
-            String bgMusic = String.format(" -ss %s -t %f -i %s -c:v copy -map 0:v:0 -map 1:a:0",
+            String cmd = String.format("-i %s -ss %s -t %f -i %s " +
+                    "-filter_complex [1:v]scale=90:-1[img1];[0:v][img1]overlay='%s':%s[v1];[0:a][2:a]amerge=inputs=2[v2] " +
+                    "-map [v2] -map [v1] ",
+                    mWaterInfo.getWaterPath(),
                     bgMusicInfo.getMusicStartTime(),
-                    inputVideoInfo.getDuration()/1000.0,
+                    editVideoDuration,
+                    bgMusicInfo.getPath(),
+                    mWaterInfo.getxPosition(),
+                    mWaterInfo.getyPosition()
+                    );
+            sb.append(cmd);
+
+        } else if (bgMusicInfo != null){
+            String bgMusic = String.format(" -ss %s -t %f -i %s -filter_complex [0:a][1:a]amerge=inputs=2[aout] -map 0:v:0 -map [aout] -ac 2 ",
+                    bgMusicInfo.getMusicStartTime(),
+                    editVideoDuration,
                     bgMusicInfo.getPath());
             sb.append(bgMusic);
         }else if (mWaterInfo != null) {
@@ -82,20 +105,8 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
             Log.i(TAG,"cmd:" + water);
             sb.append(water);
         }
-        sb.append(String.format("  -b:v 1000k %s",mTempOutPath));
+        sb.append(String.format("  -b:v 1400k %s",mTempOutPath));
         Log.i(TAG,"execute cmd:" + sb.toString());
         return FFmpegCmd.execute(sb.toString());
-    }
-
-    public VideoInfo getMediaInfo(VideoInfo inputVideoInfo) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(inputVideoInfo.getVideoPath());
-            mediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        inputVideoInfo.setDuration(mediaPlayer.getDuration());
-        return inputVideoInfo;
     }
 }

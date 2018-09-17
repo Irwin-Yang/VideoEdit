@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="增加水印"
-        android:textColor="@color/fast_tool_bg_color"
+        android:textColor="@color/common_theme_color"
         android:textSize="20sp"
         android:layout_marginBottom="20dp"
         />

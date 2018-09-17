@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="20dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="最多支持生成15s gif图片"
+        android:padding="10dp"
+        android:background="#e3e3e3"
+        android:textColor="@android:color/holo_red_light" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="起始时间" />
+
+        <EditText
+            android:id="@+id/et_gif_start_time"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="0"
+            android:inputType="number" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="秒" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="结束时间" />
+
+        <EditText
+            android:id="@+id/et_gif_end_time"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="10"
+            android:inputType="number" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="秒" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="帧率" />
+
+        <EditText
+            android:id="@+id/et_gif_frame_rate"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="10"
+            android:inputType="number" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="帧" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/btn_video_to_gif"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="转化"
+        android:textColor="#ffffff"
+        android:background="@drawable/edit_bg_shape" />
+</LinearLayout>

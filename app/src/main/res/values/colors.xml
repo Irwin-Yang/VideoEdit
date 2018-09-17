@@ -14,7 +14,7 @@
     <color name="primary_dark">#FF0288D1</color>
     <color name="status_bar_color">@color/primary_dark</color>
     <color name="white">#ffffff</color>
-    <color name="fast_tool_bg_color">#FF03A9F4</color>
+    <color name="common_theme_color">#FF03A9F4</color>
 
     <color name="all_tool_bg_color">#cecece</color>
     <color name="edit_bg_click_color">#FF4081</color>
