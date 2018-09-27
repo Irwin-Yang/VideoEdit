@@ -1,6 +1,7 @@
 package com.ruanchao.videoedit.ui.video;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -197,6 +198,13 @@ public class MainPresenter extends BasePresenter<IMainView> {
                     bannerImage.setImageResource(R.mipmap.material_image);
                 }else if (type == VIDEO_BOX_TYPE){
                     bannerImage.setImageResource(R.mipmap.box_image_banner);
+                    bannerImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(context, VideoBoxListActivity.class);
+                            context.startActivity(intent);
+                        }
+                    });
                 }
             }
         };
@@ -268,7 +276,7 @@ public class MainPresenter extends BasePresenter<IMainView> {
                 videoImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        VideoShowActivity.start(context, mVideoInfos.get(position).getVideoPath());
+                        VideoShowActivity.start(context, mVideoInfos.get(position).getVideoPath(),Constans.TYPE_VIDEO);
                     }
                 });
             return view;

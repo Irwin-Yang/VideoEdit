@@ -23,9 +23,11 @@ public class Constans {
     // 设置拍摄视频路径
     public static final String VIDEO_PATH = FFMPEG_PATH + "video";
 
-    // 设置拍摄视频路径
+    // 设置图片路径
     public static final String IMAGE_PATH = FFMPEG_PATH + "image";
 
+    // 设置音频路径
+    public static final String AUDIO_PATH = FFMPEG_PATH + "audio";
     // 设置背景音乐路径
     public static final String MUSIC_PATH = FFMPEG_PATH + "music";
 
@@ -34,5 +36,10 @@ public class Constans {
     public static final String IS_LOADED_RESOURCE = "is_loaded_resource";
 
     public static final int TYPE_VIDEO_EDIT = 1;
+
+    public static final String VIDEO_CATEGORY = "category";
+    public static final int TYPE_VIDEO = 0;
+    public static final int TYPE_IMAGE = 1;
+    public static final int TYPE_AUDIO = 2;
 
 }

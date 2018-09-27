@@ -18,4 +18,10 @@
 
     <color name="all_tool_bg_color">#cecece</color>
     <color name="edit_bg_click_color">#FF4081</color>
+
+
+    <!--加载进度状态 参数-->
+    <color name="page_load_bg">#f4f5f6</color>
+    <color name="page_load_text_color">#898989</color>
+    <!--加载进度状态 参数-->
 </resources>

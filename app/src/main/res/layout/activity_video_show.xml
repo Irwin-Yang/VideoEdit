@@ -9,12 +9,21 @@
     <LinearLayout
         android:id="@+id/ll_video_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:orientation="vertical">
         <com.ruanchao.videoedit.view.FullScreenVideoView
             android:id="@+id/videoView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/iv_gif_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <com.wuhenzhizao.titlebar.widget.CommonTitleBar

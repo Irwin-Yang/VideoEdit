@@ -93,8 +93,8 @@ public class AddWaterView extends LinearLayout implements View.OnClickListener {
     }
 
     public void setDefaultEndTime(double endTime){
-        mEndTimeView.setText(String.valueOf(endTime/1000));
-        this.endTime = endTime/1000;
+        mEndTimeView.setText(String.valueOf(endTime));
+        this.endTime = endTime;
     }
 
     @Override

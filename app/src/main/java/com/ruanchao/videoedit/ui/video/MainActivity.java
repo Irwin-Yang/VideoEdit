@@ -372,6 +372,27 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
             case 0:
                 VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_VIDEO_TO_GIF);
                 break;
+            case 1:
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //ffmpeg -y -i aa.jpg -vf "zoompan=d=150:z='min(zoom+0.0015,1.5)':x='iw/2':y='ih/2'" o.mp4
+                        String cmd =  String.format("ffmpeg -y -loop 1  -i  %s -t 3 -r 25 " +
+                                "-vf scale=480:-1 -y %s",
+                                Constans.IMAGE_PATH + "/aa.jpg",
+                                Constans.IMAGE_PATH + "/aa.mp4");
+                        Log.i(TAG,"cmd:" + cmd);
+                        FFmpegCmd.execute(cmd);
+                        Log.i(TAG,"end.............");
+
+                    }
+                });
+                thread.start();
+                break;
+                //视频转gif
+            case 2:
+                VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_IMAGE_TO_VIDEO);
+                break;
             default:
                 break;
         }

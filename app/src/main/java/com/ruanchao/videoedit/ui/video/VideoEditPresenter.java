@@ -105,7 +105,7 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
             Log.i(TAG,"cmd:" + water);
             sb.append(water);
         }
-        sb.append(String.format("  -b:v 1400k %s",mTempOutPath));
+        sb.append(String.format(" -ar 44100 -b:v 1400k %s",mTempOutPath));
         Log.i(TAG,"execute cmd:" + sb.toString());
         return FFmpegCmd.execute(sb.toString());
     }

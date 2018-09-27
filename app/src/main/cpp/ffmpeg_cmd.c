@@ -64,6 +64,7 @@ JNIEXPORT jstring JNICALL Java_com_ruanchao_videoedit_ffmpeg_FFmpegCmd_getVideoI
     //4.找到视频流
     int i = 0;
     int V_stream_idx = -1;
+    //av_find_best_stream()
     for (i ; i<pFormatContext->nb_streams; i++){
         if (pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO){
             V_stream_idx  =i;
@@ -126,7 +127,7 @@ JNIEXPORT jstring JNICALL Java_com_ruanchao_videoedit_ffmpeg_FFmpegCmd_getVideoI
 //    }
     //7.释放资源
     avformat_free_context(pFormatContext);
-    char *result = "result";
+    char *result = (char *)malloc(sizeof(char) * (10000));
 
 
     //返回的时候，要生成一个jstring类型的对象，也必须通过如下方式，必须要做转化

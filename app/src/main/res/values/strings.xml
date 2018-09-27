@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">VideoEdit</string>
+
+
+    <!--加载进度状态 参数-->
+    <string name="sw_page_loading_text">页面加载中</string>
+    <string name="sw_page_load_fail_text">加载失败，点击页面重新加载</string>
+    <string name="sw_text_empty">还没有数据呢！</string>
+    <!--加载进度状态 参数-->
 </resources>

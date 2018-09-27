@@ -16,7 +16,7 @@
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/video_edit"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -46,6 +46,9 @@
         </provider>
 
         <activity android:name=".ui.tools.VideoEditToolActivity" />
+        <activity android:name=".ui.video.VideoBoxListActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            ></activity>
     </application>
 
 </manifest>

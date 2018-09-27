@@ -104,6 +104,9 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         getTakePhoto().onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null){
+            return;
+        }
         switch (requestCode){
             case REQUEST_CODE:
                 mMusicPath = data.getStringExtra(MusicListActivity.MUSIC_PATH);

@@ -32,6 +32,17 @@
         android:text="选择编辑视频"
         android:textColor="#ffffff"
         android:background="@drawable/edit_bg_shape" />
-    <include layout="@layout/video_to_gif_layout"></include>
+    <com.ruanchao.videoedit.view.tool.VideoToGifLayout
+        android:id="@+id/video_to_gif_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.ruanchao.videoedit.view.tool.ImageToVideoView
+        android:id="@+id/image_to_video_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 
 </LinearLayout>

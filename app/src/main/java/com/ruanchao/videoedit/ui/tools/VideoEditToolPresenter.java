@@ -28,11 +28,11 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
         this.context = context;
     }
 
-    public void doEditVideo(final EditInfo editInfo, Subscriber<VideoInfo> subscriber){
+    public void doEditVideo(final EditInfo editInfo, Subscriber<EditInfo> subscriber){
 
-        mSubscriptions.add(Observable.create(new Observable.OnSubscribe<VideoInfo>() {
+        mSubscriptions.add(Observable.create(new Observable.OnSubscribe<EditInfo>() {
             @Override
-            public void call(Subscriber<? super VideoInfo> subscriber) {
+            public void call(Subscriber<? super EditInfo> subscriber) {
                 int result = -1;
                 try {
                     result = editVideo(editInfo);
@@ -41,7 +41,7 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
                 }
 
                 if (result == 0){
-                    subscriber.onNext(editInfo.videoInfo);
+                    subscriber.onNext(editInfo);
                 }else {
                     subscriber.onError(new Throwable());
                 }

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="edit_video_height">115dp</dimen>
+
+    <!--加载进度状态 参数-->
+    <dimen name="sw_load_page_margin_bottom">337dp</dimen>
+    <dimen name="sw_rm_loading_text_margin">15dp</dimen>
+    <dimen name="page_load_text_size">13sp</dimen>
+    <dimen name="sw_rm_loading_img_size">50dp</dimen>
+    <!--加载进度状态 参数-->
 </resources>

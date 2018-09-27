@@ -2,8 +2,12 @@ package com.ruanchao.videoedit.ui.tools;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,11 +21,15 @@ import com.ruanchao.videoedit.bean.EditInfo;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
+import com.ruanchao.videoedit.interf.OnStartEditListener;
 import com.ruanchao.videoedit.ui.video.MusicListActivity;
 import com.ruanchao.videoedit.ui.video.VideoEditActivity;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
+import com.ruanchao.videoedit.view.tool.ImageToVideoView;
+import com.ruanchao.videoedit.view.tool.VideoToGifLayout;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -29,19 +37,18 @@ import java.io.File;
 
 import rx.Subscriber;
 
-public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,VideoEditToolPresenter> implements IVideoEditToolView, View.OnClickListener {
+public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,VideoEditToolPresenter> implements IVideoEditToolView, View.OnClickListener, OnStartEditListener {
 
     private static final String EDIT_TYPE = "edit_type";
     private int mEditType;
     private Button mChooseVideo;
     private static final int CHOOSE_VIDEO_CODE = 100;
+    private static final int IMAGE_REQUEST_CODE = 101;
     private VideoInfo mInputVideoInfo;
+    private VideoToGifLayout mVideoToGifView;
+    private ImageToVideoView mImageToVideoView;
+    protected CommonTitleBar toolbar;
     private String TAG = VideoEditToolActivity.class.getSimpleName();
-    private Button mVideoToGif;
-    private TextView mGifStartTime;
-    private TextView mGifEndTime;
-    private EditText mFrameRateView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,33 +61,97 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null){
+            return;
+        }
         switch (requestCode){
             case CHOOSE_VIDEO_CODE:
-                Uri uri = data.getData();
-                String path = FileUtil.getFilePathByUri(this, uri);
-                File file = new File(path);
-                mInputVideoInfo = new VideoInfo();
-                mInputVideoInfo.setVideoPath(path);
-                mInputVideoInfo.setVideoName(file.getName());
-                mInputVideoInfo.setVideoTime(file.lastModified());
-                mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
-                long videoDuration = FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath());
-                mInputVideoInfo.setDuration(videoDuration);
-                mGifEndTime.setText(String.valueOf(mInputVideoInfo.getDuration()));
+                setVideo(data);
+                break;
+            case IMAGE_REQUEST_CODE:
+                setImageInfo(data);
                 break;
             default:
                 break;
         }
     }
 
+    private void setVideo(Intent data) {
+        Uri uri = data.getData();
+        String path = FileUtil.getFilePathByUri(this, uri);
+        File file = new File(path);
+        mInputVideoInfo = new VideoInfo();
+        mInputVideoInfo.setVideoPath(path);
+        mInputVideoInfo.setVideoName(file.getName());
+        mInputVideoInfo.setVideoTime(file.lastModified());
+        mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
+        long videoDuration = FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath());
+        mInputVideoInfo.setDuration(videoDuration);
+        mVideoToGifView.setInputVideoInfo(mInputVideoInfo);
+    }
+
+    private void setImageInfo(Intent data) {
+        String path;
+        Cursor cursor = null;
+        try {
+            Uri selectedImage = data.getData(); //获取系统返回的照片的Uri
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            //从系统表中查询指定Uri对应的照片
+            cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            path = cursor.getString(columnIndex);  //获取照片路径
+            File file = new File(path);
+            mInputVideoInfo = new VideoInfo();
+            mInputVideoInfo.setVideoPath(path);
+            mInputVideoInfo.setVideoName(file.getName());
+            mInputVideoInfo.setVideoTime(file.lastModified());
+            mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
+            mImageToVideoView.setInputVideoInfo(mInputVideoInfo);
+        } catch (Exception e) {
+            // TODO Auto-generatedcatch block
+            e.printStackTrace();
+        }finally {
+            if (cursor !=null) {
+                cursor.close();
+            }
+        }
+    }
+
     private void initView() {
         mChooseVideo = findViewById(R.id.btn_choose_video);
         mChooseVideo.setOnClickListener(this);
-        mVideoToGif = findViewById(R.id.btn_video_to_gif);
-        mVideoToGif.setOnClickListener(this);
-        mGifStartTime = findViewById(R.id.et_gif_start_time);
-        mGifEndTime = findViewById(R.id.et_gif_end_time);
-        mFrameRateView = findViewById(R.id.et_gif_frame_rate);
+        mVideoToGifView = findViewById(R.id.video_to_gif_view);
+        mImageToVideoView = findViewById(R.id.image_to_video_view);
+        mVideoToGifView.setOnStartEditListener(this);
+        toolbar = findViewById(R.id.titlebar);
+        if (toolbar != null) {
+            toolbar.setListener(new CommonTitleBar.OnTitleBarListener() {
+                @Override
+                public void onClicked(View v, int action, String extra) {
+                    if (action == CommonTitleBar.ACTION_LEFT_TEXT) {
+                        finish();
+                    }
+                }
+            });
+        }
+
+        showEditView();
+    }
+
+    private void showEditView() {
+        switch (mEditType){
+            case EditInfo.EDIT_TYPE_VIDEO_TO_GIF:
+                mVideoToGifView.setVisibility(View.VISIBLE);
+                break;
+            case EditInfo.EDIT_TYPE_IMAGE_TO_VIDEO:
+                mImageToVideoView.setVisibility(View.VISIBLE);
+                mChooseVideo.setText("选择编辑图片");
+                break;
+                default:
+                    break;
+        }
     }
 
     public static void start(Context context,int type){
@@ -108,48 +179,27 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_choose_video:
-                Intent intent = new Intent();
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, CHOOSE_VIDEO_CODE);
+
+                if (mEditType == EditInfo.EDIT_TYPE_IMAGE_TO_VIDEO){
+                    Intent intent = new Intent(
+                            Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, IMAGE_REQUEST_CODE);
+                }else {
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    intent.setType("video/*");
+                    startActivityForResult(intent, CHOOSE_VIDEO_CODE);
+                }
                 break;
-            case R.id.btn_video_to_gif:
-                videoToGif();
             default:
                     break;
         }
     }
 
-    private void videoToGif() {
-        if (mInputVideoInfo == null){
-            mToast.setText("请先选择视频");
-            mToast.show();
-            return;
-        }
-        double startTime = Double.parseDouble(mGifStartTime.getText().toString());
-        double endTime = Double.parseDouble(mGifEndTime.getText().toString());
-        int frameRate = Integer.parseInt(mFrameRateView.getText().toString());
-        if (startTime < 0 || startTime > mInputVideoInfo.getDuration()
-                || endTime < 0 || endTime>mInputVideoInfo.getDuration() || endTime < startTime){
-            mToast.setText("视频转化起始时间输入有误，请重新输入");
-            mToast.show();
-        }
-        if (frameRate >= 15 || frameRate <= 7){
-            mToast.setText("帧率建议在7~15帧之间");
-            mToast.show();
-        }
-        EditInfo editInfo = new EditInfo();
-        editInfo.editType = EditInfo.EDIT_TYPE_VIDEO_TO_GIF;
-        editInfo.videoInfo = mInputVideoInfo;
-        editInfo.gifInfo = new EditInfo.GifInfo();
-        editInfo.gifInfo.startTime = startTime;
-        editInfo.gifInfo.endTime = endTime;
-        editInfo.gifInfo.frameRate = frameRate;
-        startEdit(editInfo);
-    }
-
-    private void startEdit(EditInfo editInfo) {
-        mPresenter.doEditVideo(editInfo,new Subscriber<VideoInfo>() {
+    @Override
+    public void onStartEdit(EditInfo editInfo) {
+        mPresenter.doEditVideo(editInfo,new Subscriber<EditInfo>() {
             @Override
             public void onStart() {
                 super.onStart();
@@ -172,11 +222,11 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
             }
 
             @Override
-            public void onNext(VideoInfo videoInfo) {
+            public void onNext(EditInfo editInfo) {
                 Toast.makeText(VideoEditToolActivity.this,"执行结束", Toast.LENGTH_LONG).show();
-                if (videoInfo != null) {
-                    if (videoInfo.getType() == VideoInfo.TYPE_GIF){
-                        mToast.setText("Gif生成成功，保存在"+videoInfo.getVideoPath());
+                if (editInfo != null) {
+                    if (editInfo.editType == EditInfo.EDIT_TYPE_VIDEO_TO_GIF){
+                        mToast.setText("Gif生成成功，保存在"+editInfo.videoInfo.getVideoPath());
                         mToast.show();
                     }
                 }else {
