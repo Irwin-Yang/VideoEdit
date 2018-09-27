@@ -13,6 +13,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import java.io.OutputStream;
 public class FileUtil {
 
     private static final String SEPARATOR = File.separator;//路径分隔符
+    private static final String TAG = FileUtil.class.getSimpleName();
 
     /**
      * 复制文件目录
@@ -105,6 +107,47 @@ public class FileUtil {
         try {
             InputStream streamFrom = new FileInputStream(srcFile);
             OutputStream streamTo = new FileOutputStream(destFile);
+            byte buffer[] = new byte[1024];
+            int len;
+            while ((len = streamFrom.read(buffer)) > 0) {
+                streamTo.write(buffer, 0, len);
+            }
+            streamFrom.close();
+            streamTo.close();
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    /**
+     * 把文件拷贝到某一目录下，并重新命名
+     *
+     * @param srcFile
+     * @param destFilePath
+     * @return
+     */
+    public static boolean copyFileToDirFile(String srcFile, String destFilePath) {
+        File fileDir = new File(destFilePath);
+        //判断父目录是否存在
+        if (!fileDir.getParentFile().exists()) {
+            //父目录不存在 创建父目录
+            Log.d(TAG,"creating parent directory...");
+            if (!fileDir.getParentFile().mkdirs()) {
+                Log.e(TAG,"created parent directory failed.");
+                return false;
+            }
+        }
+        try {
+            if(!fileDir.createNewFile()){
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            InputStream streamFrom = new FileInputStream(srcFile);
+            OutputStream streamTo = new FileOutputStream(fileDir);
             byte buffer[] = new byte[1024];
             int len;
             while ((len = streamFrom.read(buffer)) > 0) {

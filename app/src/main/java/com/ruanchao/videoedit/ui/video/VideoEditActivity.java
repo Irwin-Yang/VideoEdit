@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.hp.hpl.sparta.Text;
 import com.jph.takephoto.app.TakePhoto;
 import com.jph.takephoto.app.TakePhotoImpl;
 import com.jph.takephoto.model.CropOptions;
@@ -109,7 +110,16 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         }
         switch (requestCode){
             case REQUEST_CODE:
-                mMusicPath = data.getStringExtra(MusicListActivity.MUSIC_PATH);
+                String tempPath = data.getStringExtra(MusicListActivity.MUSIC_PATH);
+                if (TextUtils.isEmpty(tempPath)){
+                    return;
+                }
+                String musicPath = Constans.AUDIO_PATH + "/"
+                        + System.currentTimeMillis()
+                        + tempPath.substring(tempPath.lastIndexOf("."));
+                if(FileUtil.copyFileToDirFile(tempPath, musicPath)) {
+                    mMusicPath = musicPath;
+                }
                 break;
             case CHOOSE_VIDEO_CODE:
                 Uri uri = data.getData();
@@ -204,6 +214,14 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 if (mProgressDialog != null){
                     mProgressDialog.dismiss();
                 }
+                //删除临时文件背景音乐
+                if (!TextUtils.isEmpty(mMusicPath)) {
+                    File file = new File(mMusicPath);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
+                //TODO 删除临时水印
             }
 
             @Override

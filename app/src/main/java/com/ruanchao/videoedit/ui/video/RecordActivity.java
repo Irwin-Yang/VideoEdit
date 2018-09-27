@@ -30,6 +30,9 @@ import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.BothWayProgressBar;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
 
 import java.io.File;
 import java.io.IOException;
@@ -527,8 +530,20 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
         }
     }
 
-    public static void startRecordActivity(Context context){
-        context.startActivity(new Intent(context,RecordActivity.class));
+    public static void startRecordActivity(final Context context){
+        AndPermission.with(context)
+                .permission(Permission.Group.CAMERA,Permission.Group.MICROPHONE)
+                .onGranted(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        context.startActivity(new Intent(context,RecordActivity.class));
+                    }
+                }).onDenied(new Action() {
+            @Override
+            public void onAction(List<String> permissions) {
+                Toast.makeText(context,"必须获取相机和录音权限才可以进行拍摄视频", Toast.LENGTH_LONG).show();
+            }
+        }).start();
     }
 
 }

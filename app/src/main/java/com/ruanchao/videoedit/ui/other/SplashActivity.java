@@ -1,19 +1,33 @@
 package com.ruanchao.videoedit.ui.other;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.ruanchao.videoedit.R;
 
 import com.ruanchao.videoedit.ui.video.MainActivity;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.FileUtil;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
+import com.yanzhenjie.permission.Rationale;
+import com.yanzhenjie.permission.RequestExecutor;
+import com.yanzhenjie.permission.SettingService;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -36,6 +50,10 @@ public class SplashActivity extends Activity {
     private final static int TIME_COUNT = 3;
     private SharedPreferences mSP;
     private Subscription mSubscribeLoadRes;
+    private String[] permissions = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +68,40 @@ public class SplashActivity extends Activity {
 //        Glide.with(this)
 //                .load("http://api.dujin.org/bing/1920.php")
 //                .into(mSplashView);
-        initData();
+        initPermission();
+    }
+
+    private void initPermission() {
+        AndPermission.with(this)
+                .permission(permissions)
+                .onGranted(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        initData();
+                    }
+                }).onDenied(new Action() {
+            @Override
+            public void onAction(List<String> permissions) {
+                //创建对话框让用户同意使用该权限
+                AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+                builder.setTitle("请求权限")
+                        .setMessage("请求权限访问手机视频进行编辑，否则将退出应用！")
+                        .setPositiveButton("同意", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //同意的话，继续重新请求权限
+                                initPermission();
+                            }
+                        })
+                        .setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //拒绝的话 退出应用
+                                finish();
+                            }
+                        }).show();
+            }
+        }).start();
     }
 
     private void initData() {
@@ -134,4 +185,5 @@ public class SplashActivity extends Activity {
             mSubscribeLoadRes = null;
         }
     }
+
 }
