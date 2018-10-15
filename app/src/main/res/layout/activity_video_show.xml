@@ -36,5 +36,8 @@
         titlebar:showBottomLine="false"
         titlebar:leftDrawable="@mipmap/back"
         titlebar:leftTextColor="#ffffff"
-        titlebar:leftText="视频预览" />
+        titlebar:leftText="视频预览"
+        titlebar:rightType="imageButton"
+        titlebar:rightImageResource="@mipmap/share_icon"
+        />
 </FrameLayout>

@@ -83,6 +83,12 @@
             android:layout_height="wrap_content"
             android:text="帧" />
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="20dp"
+        android:background="#ececec"
+        />
     <Button
         android:id="@+id/btn_video_to_gif"
         android:layout_width="match_parent"

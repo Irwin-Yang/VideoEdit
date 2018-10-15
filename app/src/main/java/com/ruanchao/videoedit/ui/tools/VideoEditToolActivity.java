@@ -124,6 +124,7 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
         mChooseVideo.setOnClickListener(this);
         mVideoToGifView = findViewById(R.id.video_to_gif_view);
         mImageToVideoView = findViewById(R.id.image_to_video_view);
+        mImageToVideoView.setOnStartEditListener(this);
         mVideoToGifView.setOnStartEditListener(this);
         toolbar = findViewById(R.id.titlebar);
         if (toolbar != null) {
@@ -225,6 +226,7 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
             public void onNext(EditInfo editInfo) {
                 Toast.makeText(VideoEditToolActivity.this,"执行结束", Toast.LENGTH_LONG).show();
                 if (editInfo != null) {
+                    EventBus.getDefault().post(new EditFinishMsg(editInfo.videoInfo));
                     if (editInfo.editType == EditInfo.EDIT_TYPE_VIDEO_TO_GIF){
                         mToast.setText("Gif生成成功，保存在"+editInfo.videoInfo.getVideoPath());
                         mToast.show();

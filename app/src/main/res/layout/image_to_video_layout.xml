@@ -48,6 +48,54 @@
             android:layout_height="wrap_content"
             android:text="秒" />
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择特效"
+        android:background="#ececec"
+        android:textColor="#000000"
+        />
+    <RadioGroup
+        android:id="@+id/main_radiogroup_effect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/main_radiobutton_effect_zoom"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="20dp"
+            android:padding="10dp"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="放缩"
+            android:gravity="center"
+            android:button="@null"
+            android:background="@drawable/radiobutton_image_effect"/>
+        <RadioButton
+            android:id="@+id/main_radiobutton_effect_no"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="20dp"
+            android:padding="10dp"
+            android:text="无特效"
+            android:gravity="center"
+            android:button="@null"
+            android:background="@drawable/radiobutton_image_effect"/>
+
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="20dp"
+        android:background="#ececec"
+        />
+
     <Button
         android:id="@+id/btn_image_to_video"
         android:layout_width="match_parent"

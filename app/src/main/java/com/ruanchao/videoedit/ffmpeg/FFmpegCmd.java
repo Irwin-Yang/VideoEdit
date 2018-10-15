@@ -9,9 +9,17 @@ public class FFmpegCmd {
         void onEnd(int result);
     }
 
-    static{
-        System.loadLibrary("media-handle");
+    static {
+        System.loadLibrary("avutil");
+        System.loadLibrary("swresample");
+        System.loadLibrary("avcodec");
+        System.loadLibrary("avformat");
+        System.loadLibrary("swscale");
+        System.loadLibrary("avfilter");
+        System.loadLibrary("avdevice");
+        System.loadLibrary("ffmpegcmd");
     }
+
 
     //开子线程调用native方法进行音视频处理
     public static void execute(final String commands, final OnHandleListener onHandleListener){
@@ -37,6 +45,7 @@ public class FFmpegCmd {
     public static int execute(final String commands) {
         String regulation = "[ \\t]+";
         final String[] split = commands.split(regulation);
+        Log.i("FFmpegCmd","FFmpegCmd:" + commands );
         int result = handle(split);
         return result;
     }

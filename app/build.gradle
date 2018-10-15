@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '88888888'
+            storePassword '88888888'
+            storeFile file('rc.keystory')
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.ruanchao.videoedit"
@@ -13,10 +21,10 @@ android {
             cmake {
                 cppFlags ""
             }
-        }
-        ndk {
-            abiFilters "armeabi-v7a"
-            ldLibs "log", "z", "m"
+            ndk {
+                abiFilters "armeabi-v7a"
+                ldLibs "log", "z", "m"
+            }
         }
     }
     buildTypes {
@@ -25,6 +33,9 @@ android {
             aaptOptions.cruncherEnabled = false
             aaptOptions.useNewCruncher = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
     externalNativeBuild {
@@ -35,7 +46,7 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
-            jni.srcDirs = []
+            jniLibs.srcDirs = ['src/main/cpp/ffmpeg']
         }
     }
 }
@@ -66,8 +77,24 @@ dependencies {
     api 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation files('libs/pinyin4j-2.5.0.jar')
+    //titlebar
     implementation 'com.wuhenzhizao:titlebar:1.1.3'
     implementation 'com.android.support:design:27.1.0'
-    //implementation 'pub.devrel:easypermissions:1.3.0'
+    //权限弹框
     implementation 'com.yanzhenjie:permission:2.0.0-rc3'
+    //友盟
+    implementation files('libs/SecurityEnvSDK-release-1.1.0.jar')
+    implementation files('libs/umeng-common-1.5.3.jar')
+    implementation files('libs/umeng-share-core-6.9.3.jar')
+    implementation files('libs/umeng-share-QQ-simplify-6.9.3.jar')
+    implementation files('libs/umeng-share-sina-simplify-6.9.3.jar')
+    implementation files('libs/umeng-share-wechat-simplify-6.9.3.jar')
+    implementation files('libs/umeng-shareboard-widget-6.9.3.jar')
+    implementation files('libs/umeng-sharetool-6.9.3.jar')
+    implementation files('libs/utdid4all-1.1.5.3_proguard.jar')
+    //阿里云OSS
+    implementation 'com.aliyun.dpa:oss-android-sdk:+'
+    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.squareup.okio:okio:1.9.0'
+
 }

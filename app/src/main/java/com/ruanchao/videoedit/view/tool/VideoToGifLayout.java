@@ -18,7 +18,7 @@ import com.ruanchao.videoedit.bean.EditInfo;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.interf.OnStartEditListener;
 
-public class VideoToGifLayout extends LinearLayout implements View.OnClickListener {
+public class VideoToGifLayout extends BaseToolLayout implements View.OnClickListener {
 
     private Button mVideoToGif;
     private TextView mGifStartTime;
@@ -102,11 +102,5 @@ public class VideoToGifLayout extends LinearLayout implements View.OnClickListen
         if (mOnStartEditListener != null){
             mOnStartEditListener.onStartEdit(editInfo);
         }
-    }
-
-    private OnStartEditListener mOnStartEditListener;
-
-    public void setOnStartEditListener(OnStartEditListener onStartEditListener){
-        mOnStartEditListener = onStartEditListener;
     }
 }

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.Window;
@@ -47,7 +48,7 @@ public class SplashActivity extends Activity {
     private ImageView mSplashView;
     private TextView mTimeTip;
     private Subscription mSubscribe;
-    private final static int TIME_COUNT = 3;
+    private final static int TIME_COUNT = 2;
     private SharedPreferences mSP;
     private Subscription mSubscribeLoadRes;
     private String[] permissions = {
@@ -68,7 +69,9 @@ public class SplashActivity extends Activity {
 //        Glide.with(this)
 //                .load("http://api.dujin.org/bing/1920.php")
 //                .into(mSplashView);
-        initPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            initPermission();
+        }
     }
 
     private void initPermission() {

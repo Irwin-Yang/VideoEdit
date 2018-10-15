@@ -13,6 +13,13 @@ import android.widget.Toast;
 
 import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
+import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
+import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
+import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
+import com.alibaba.sdk.android.oss.model.PutObjectRequest;
+import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.adapter.SubAdapter;
@@ -23,6 +30,7 @@ import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.ui.tools.VideoEditToolActivity;
+import com.ruanchao.videoedit.util.AliOssUtil;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FFmpegUtil;
@@ -42,8 +50,6 @@ import static com.ruanchao.videoedit.ui.video.MainPresenter.VIDEO_LIST_TITLE_TYP
 public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> implements View.OnClickListener,IMainView {
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "smallvideo";
-    private static final String srcFile = PATH + File.separator + "hello.mp4";
-    private static final String appendVideo = PATH + File.separator + "test.mp4";
     private static final String TAG = "MainActivity";
     private RecyclerView mMainRecycler;
     private DelegateAdapter mDelegateAdapter;
@@ -97,7 +103,7 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         mDelegateAdapter.addAdapter(mPresenter.initMaterialTitleAdapter(MainPresenter.MATERIAL_TYPE));
         mDelegateAdapter.addAdapter(mPresenter.initMaterialAdapter(MainPresenter.MATERIAL_TYPE));
         mDelegateAdapter.addAdapter(new SubAdapter(this,new LinearLayoutHelper(),
-                R.layout.edited_main_title_layout,20,8));
+                R.layout.edited_main_title_layout,0,8));
 
         final double maxAlphaEffectHeight = 240.0;
         final CommonTitleBar titleBar = findViewById(R.id.titlebar);
@@ -137,7 +143,6 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_test:
-                testVideo();
                 break;
 
             default:
@@ -157,90 +162,6 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
                 default:
                     break;
         }
-    }
-
-    private void testVideo() {
-        String commandLine = null;
-        int handleType =4;
-        switch (handleType){
-            case 0://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
-                String transformVideo = PATH + File.separator + "transformVideo.flv";
-                commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
-                break;
-            case 1://视频剪切
-                String cutVideo = PATH + File.separator + "cutVideo.mp4";
-                int startTime = 0;
-                int duration = 20;
-                commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo);
-                break;
-            case 2://视频合并
-//                commandLine = FFmpegUtil.toTs(srcFile, ts1);
-//                concatStep ++;
-//                String concatVideo = PATH + File.separator + "concatVideo.mp4";
-//                String appendVideo = PATH + File.separator + "test.mp4";
-//                File concatFile = new File(PATH + File.separator + "fileList.txt");
-//                try {
-//                    FileOutputStream fileOutputStream = new FileOutputStream(concatFile);
-//                    fileOutputStream.write(("file \'" + srcFile + "\'").getBytes());
-//                    fileOutputStream.write("\n".getBytes());
-//                    fileOutputStream.write(("file \'" + appendVideo + "\'").getBytes());
-//                    fileOutputStream.flush();
-//                    fileOutputStream.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//                commandLine = FFmpegUtil.concatVideo(srcFile, concatFile.getAbsolutePath(), concatVideo);
-                break;
-            case 3://视频截图
-                String screenShot = PATH + File.separator + "screenShot.jpg";
-                String size = "1080x720";
-                commandLine = FFmpegUtil.screenShot(srcFile, size, screenShot);
-                break;
-            case 4://视频添加水印
-                //1、图片
-                String photo = PATH + File.separator + "launcher.png";
-                String photoMark = PATH + File.separator + "photoMark.mp4";
-                commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, photoMark);
-                //2、文字
-                //String text = "Hello,FFmpeg";
-                //String textPath = PATH + File.separator + "text.jpg";
-                //boolean result = BitmapUtil.textToPicture(textPath, text, this);
-                //Log.i(TAG, "text to pitcture result=" + result);
-                //String textMark = PATH + File.separator + "textMark.mp4";
-                //commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, textMark);
-                break;
-            case 5://视频转成gif
-                String Video2Gif = PATH + File.separator + "Video2Gif.gif";
-                int gifStart = 1;
-                int gifDuration = 5;
-                commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration, Video2Gif);
-                break;
-            case 6://屏幕录制
-//                String screenRecord = PATH + File.separator + "screenRecord.mp4";
-//                String screenSize = "320x240";
-//                int recordTime = 10;
-//                commandLine = FFmpegUtil.screenRecord(screenSize, recordTime, screenRecord);
-                break;
-            case 7://图片合成视频
-                //图片所在路径，图片命名格式img+number.jpg
-                String picturePath = PATH + File.separator + "img/";
-                String combineVideo = PATH + File.separator + "combineVideo.mp4";
-                commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
-                break;
-            case 8://视频解码播放
-                //startActivity(new Intent(VideoHandleActivity.this, VideoPlayerActivity.class));
-                return;
-            case 9://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
-                String input1 = PATH + File.separator + "input1.mp4";
-                String input2 = PATH + File.separator + "input2.mp4";
-                String outputFile = PATH + File.separator + "multi.mp4";
-                //commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
-                break;
-            default:
-                break;
-        }
-        executeFFmpegCmd(commandLine);
     }
 
     /**
@@ -373,21 +294,6 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
                 VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_VIDEO_TO_GIF);
                 break;
             case 1:
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //ffmpeg -y -i aa.jpg -vf "zoompan=d=150:z='min(zoom+0.0015,1.5)':x='iw/2':y='ih/2'" o.mp4
-                        String cmd =  String.format("ffmpeg -y -loop 1  -i  %s -t 3 -r 25 " +
-                                "-vf scale=480:-1 -y %s",
-                                Constans.IMAGE_PATH + "/aa.jpg",
-                                Constans.IMAGE_PATH + "/aa.mp4");
-                        Log.i(TAG,"cmd:" + cmd);
-                        FFmpegCmd.execute(cmd);
-                        Log.i(TAG,"end.............");
-
-                    }
-                });
-                thread.start();
                 break;
                 //视频转gif
             case 2:
