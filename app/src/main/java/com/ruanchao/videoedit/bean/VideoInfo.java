@@ -15,22 +15,25 @@ public class VideoInfo implements Serializable,Comparable<VideoInfo> {
     public static final int TYPE_VIDEO = 1;
     public static final int TYPE_GIF = 2;
     private int type = TYPE_VIDEO;
-    private String videoPath;
+    public String path;
     private long videoTime;
     private String videoTitle = "";
     private String videoName;
-    private float duration;
+    public float duration;
     private boolean isEditSuccess = false;
     private String imagePath;
     public int width;
     public int height;
+    public int rotation;//旋转角度
+    public int cutPoint;//剪切的开始点
+    public int cutDuration;//剪切的时长
 
-    public String getVideoPath() {
-        return videoPath;
+    public String getPath() {
+        return path;
     }
 
-    public void setVideoPath(String videoPath) {
-        this.videoPath = videoPath;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public long getVideoTime() {

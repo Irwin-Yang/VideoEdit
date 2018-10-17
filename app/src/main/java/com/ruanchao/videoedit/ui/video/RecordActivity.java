@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -353,7 +351,7 @@ public class RecordActivity extends BaseActivity implements SurfaceHolder.Callba
             return;
         }
         VideoInfo videoInfo = new VideoInfo();
-        videoInfo.setVideoPath(mTargetFile.getAbsolutePath());
+        videoInfo.setPath(mTargetFile.getAbsolutePath());
         videoInfo.setType(VideoInfo.TYPE_VIDEO);
         videoInfo.setVideoTitle(DateUtil.timeToDate(mVideoTime));
         videoInfo.setVideoName(mVideoName);

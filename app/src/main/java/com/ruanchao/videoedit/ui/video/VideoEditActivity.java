@@ -1,6 +1,5 @@
 package com.ruanchao.videoedit.ui.video;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.hp.hpl.sparta.Text;
 import com.jph.takephoto.app.TakePhoto;
 import com.jph.takephoto.app.TakePhotoImpl;
 import com.jph.takephoto.model.CropOptions;
@@ -130,7 +128,7 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 String path = FileUtil.getFilePathByUri(this, uri);
                 File file = new File(path);
                 mInputVideoInfo = new VideoInfo();
-                mInputVideoInfo.setVideoPath(path);
+                mInputVideoInfo.setPath(path);
                 mInputVideoInfo.setVideoName(file.getName());
                 mInputVideoInfo.setVideoTime(file.lastModified());
                 mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
@@ -190,10 +188,10 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     private void setVideoInfo() {
         mShadeView.setVisibility(View.GONE);
         toolbar.getRightImageButton().setVisibility(View.VISIBLE);
-        Uri videoUri = Uri.parse(mInputVideoInfo.getVideoPath());
+        Uri videoUri = Uri.parse(mInputVideoInfo.getPath());
         mVideoView.setVideoURI(videoUri);
         startVideo();
-        mInputVideoInfo.setDuration(FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath()));
+        mInputVideoInfo.setDuration(FFmpegCmd.getVideoDuration(mInputVideoInfo.getPath()));
     }
 
     private void startVideo(){
@@ -238,10 +236,10 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 if (videoInfo != null) {
                     if (videoInfo.isEditSuccess()) {
                         //EventBus.getDefault().post(new FinishVideoMsgEvent(videoInfo));
-                        mToast.setText("视频保存在：" + videoInfo.getVideoPath());
+                        mToast.setText("视频保存在：" + videoInfo.getPath());
                         mToast.show();
                     }else {
-                        mToast.setText("视频编辑失败，原始视频保存在：" + videoInfo.getVideoPath());
+                        mToast.setText("视频编辑失败，原始视频保存在：" + videoInfo.getPath());
                         mToast.show();
                     }
                 }

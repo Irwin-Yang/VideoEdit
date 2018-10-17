@@ -1,1 +1,1 @@
-include ':app','gpuvideo'
+include ':app','gpuvideo','videofilter'

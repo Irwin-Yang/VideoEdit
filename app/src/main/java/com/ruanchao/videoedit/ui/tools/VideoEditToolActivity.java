@@ -3,16 +3,11 @@ package com.ruanchao.videoedit.ui.tools;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ruanchao.videoedit.R;
@@ -22,9 +17,6 @@ import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.interf.OnStartEditListener;
-import com.ruanchao.videoedit.ui.video.MusicListActivity;
-import com.ruanchao.videoedit.ui.video.VideoEditActivity;
-import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.tool.ImageToVideoView;
@@ -83,11 +75,11 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
         String path = FileUtil.getFilePathByUri(this, uri);
         File file = new File(path);
         mInputVideoInfo = new VideoInfo();
-        mInputVideoInfo.setVideoPath(path);
+        mInputVideoInfo.setPath(path);
         mInputVideoInfo.setVideoName(file.getName());
         mInputVideoInfo.setVideoTime(file.lastModified());
         mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
-        long videoDuration = FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath());
+        long videoDuration = FFmpegCmd.getVideoDuration(mInputVideoInfo.getPath());
         mInputVideoInfo.setDuration(videoDuration);
         switch (mEditType) {
             case EditInfo.EDIT_TYPE_VIDEO_TO_GIF:
@@ -115,7 +107,7 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
             path = cursor.getString(columnIndex);  //获取照片路径
             File file = new File(path);
             mInputVideoInfo = new VideoInfo();
-            mInputVideoInfo.setVideoPath(path);
+            mInputVideoInfo.setPath(path);
             mInputVideoInfo.setVideoName(file.getName());
             mInputVideoInfo.setVideoTime(file.lastModified());
             mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
@@ -244,7 +236,7 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
                 if (editInfo != null) {
                     EventBus.getDefault().post(new EditFinishMsg(editInfo.videoInfo));
                     if (editInfo.editType == EditInfo.EDIT_TYPE_VIDEO_TO_GIF){
-                        mToast.setText("Gif生成成功，保存在"+editInfo.videoInfo.getVideoPath());
+                        mToast.setText("Gif生成成功，保存在"+editInfo.videoInfo.getPath());
                         mToast.show();
                     }
                 }else {

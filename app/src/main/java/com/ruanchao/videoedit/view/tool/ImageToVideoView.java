@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.bean.EditInfo;
 import com.ruanchao.videoedit.bean.VideoInfo;
-import com.ruanchao.videoedit.interf.OnStartEditListener;
 
 public class ImageToVideoView extends BaseToolLayout implements View.OnClickListener {
 
@@ -80,7 +78,7 @@ public class ImageToVideoView extends BaseToolLayout implements View.OnClickList
 
     public void setInputVideoInfo(VideoInfo mInputVideoInfo) {
         this.mInputVideoInfo = mInputVideoInfo;
-        mImagePathView.setText(mInputVideoInfo.getVideoPath());
+        mImagePathView.setText(mInputVideoInfo.getPath());
     }
 
 

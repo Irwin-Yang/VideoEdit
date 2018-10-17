@@ -2,7 +2,6 @@ package com.ruanchao.videoedit.ui.video;
 
 import android.app.Application;
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.ruanchao.videoedit.base.BasePresenter;
@@ -15,13 +14,11 @@ import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 
 import java.io.File;
-import java.io.IOException;
 
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
 
@@ -49,7 +46,7 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
                 //移到视频文件夹
                 if (result == 0 && FileUtil.moveFile(mTempOutPath, Constans.VIDEO_PATH)){
                     VideoInfo videoInfo = new VideoInfo();
-                    videoInfo.setVideoPath(mOutPath);
+                    videoInfo.setPath(mOutPath);
                     videoInfo.setVideoTime(mOutFileTime);
                     videoInfo.setVideoName(mOutFileName);
                     videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));
@@ -57,7 +54,7 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
                     videoInfo.setType(VideoInfo.TYPE_VIDEO);
                     subscriber.onNext(videoInfo);
                 }else {
-                    FileUtil.moveFile(inputVideoInfo.getVideoPath(), Constans.VIDEO_PATH);
+                    FileUtil.moveFile(inputVideoInfo.getPath(), Constans.VIDEO_PATH);
                     inputVideoInfo.setEditSuccess(false);
                     subscriber.onNext(inputVideoInfo);
                 }
@@ -70,7 +67,7 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
     }
 
     private int ffmpegEditVideo(VideoInfo inputVideoInfo, WaterInfo mWaterInfo,Music bgMusicInfo) throws Exception{
-        String mInputVideo = inputVideoInfo.getVideoPath();
+        String mInputVideo = inputVideoInfo.getPath();
         StringBuffer sb = new StringBuffer();
         sb.append(String.format("ffmpeg -y -threads 2 -i %s ",mInputVideo));
         //控制视频最大时长为20s,避免视频过大耗时

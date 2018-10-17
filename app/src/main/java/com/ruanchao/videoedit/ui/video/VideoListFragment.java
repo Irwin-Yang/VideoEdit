@@ -70,7 +70,7 @@ public class VideoListFragment extends Fragment{
         mDataListAdapter.setOnclickListener(new DataListAdapter.OnclickListener() {
             @Override
             public void setOnclick(VideoInfo videoInfo) {
-                VideoShowActivity.start(getActivity(), videoInfo.getVideoPath(),mDataType);
+                VideoShowActivity.start(getActivity(), videoInfo.getPath(),mDataType);
             }
         });
         mVideoRecycler.addItemDecoration(new RecycleViewDecoration(getActivity(),RecycleViewDecoration.VERTICAL_LIST));
@@ -134,7 +134,7 @@ public class VideoListFragment extends Fragment{
         for (File file:files){
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.setVideoName(file.getName());
-            videoInfo.setVideoPath(file.getAbsolutePath());
+            videoInfo.setPath(file.getAbsolutePath());
             videoInfo.setVideoTime(file.lastModified());
             videoInfos.add(videoInfo);
         }

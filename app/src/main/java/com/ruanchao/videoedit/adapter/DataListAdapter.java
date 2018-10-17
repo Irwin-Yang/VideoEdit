@@ -38,9 +38,9 @@ public class DataListAdapter extends RecyclerView.Adapter{
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
         DataHolder dataHolder = (DataHolder) holder;
-        dataHolder.mItemPath.setText(mVideoInfos.get(position).getVideoPath());
+        dataHolder.mItemPath.setText(mVideoInfos.get(position).getPath());
         dataHolder.mItemTitle.setText(mVideoInfos.get(position).getVideoName());
-        String videoPath = mVideoInfos.get(position).getVideoPath();
+        String videoPath = mVideoInfos.get(position).getPath();
         Glide.with(context)
                 .load(Uri.fromFile(new File(videoPath)))
                 .centerCrop()

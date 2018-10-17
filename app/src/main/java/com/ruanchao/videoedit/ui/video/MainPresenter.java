@@ -261,7 +261,7 @@ public class MainPresenter extends BasePresenter<IMainView> {
             View view = LayoutInflater.from(context).inflate(R.layout.video_list_item_layout, null);
             TextView videoTitle = view.findViewById(R.id.tv_video_title);
             ImageView videoImg = view.findViewById(R.id.iv_video_img);
-                String videoPath = mVideoInfos.get(position).getVideoPath();
+                String videoPath = mVideoInfos.get(position).getPath();
                 if (mImageWidth == 0){
                     mImageWidth = (DensityUtil.getWindowWidth()) / 3;
                 }
@@ -276,7 +276,7 @@ public class MainPresenter extends BasePresenter<IMainView> {
                 videoImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        VideoShowActivity.start(context, mVideoInfos.get(position).getVideoPath(),Constans.TYPE_VIDEO);
+                        VideoShowActivity.start(context, mVideoInfos.get(position).getPath(),Constans.TYPE_VIDEO);
                     }
                 });
             return view;

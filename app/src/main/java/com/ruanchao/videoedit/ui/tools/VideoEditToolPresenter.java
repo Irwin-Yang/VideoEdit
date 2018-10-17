@@ -80,7 +80,7 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
         if (editInfo.imageInfo.effect == ImageToVideoView.EFFECT_NO){
             cmd =  String.format("ffmpeg -y -threads 2 -loop 1  -i  %s -t %d -r 25 " +
                             "-vf scale=480:-1 -y %s",
-                    editInfo.videoInfo.getVideoPath(),
+                    editInfo.videoInfo.getPath(),
                     editInfo.imageInfo.duration,
                     mOutVideoTempPath);
         }else if (editInfo.imageInfo.effect == ImageToVideoView.EFFECT_ZOOM){
@@ -88,14 +88,14 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
             //使用Options类来获取
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;//这个参数设置为true才有效，
-            Bitmap bmp = BitmapFactory.decodeFile(editInfo.videoInfo.getVideoPath(), options);//这里的bitmap是个空
+            Bitmap bmp = BitmapFactory.decodeFile(editInfo.videoInfo.getPath(), options);//这里的bitmap是个空
             int outHeight=options.outHeight;
             int outWidth= options.outWidth;
             double scale = outWidth/480.0;
             int height = (int) (outHeight /scale);
             cmd = String.format("ffmpeg -threads 2 -loop 1 -i %s -vf " +
                             "zoompan=z='if(lte(on,%d),zoom+0.003,zoom-0.003)':d=%d:fps=25:s=480x%d -t %d %s",
-                    editInfo.videoInfo.getVideoPath(),
+                    editInfo.videoInfo.getPath(),
                     editInfo.imageInfo.duration * 25/2,
                     editInfo.imageInfo.duration * 25,
                     height,
@@ -106,7 +106,7 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
         int result = FFmpegCmd.execute(cmd);
         //移到视频文件夹
         if (result == 0 && FileUtil.moveFile(mOutVideoTempPath, Constans.VIDEO_PATH)){
-            editInfo.videoInfo.setVideoPath(mOutVideoPath);
+            editInfo.videoInfo.setPath(mOutVideoPath);
             editInfo.videoInfo.setVideoTime(mOutFileTime);
             editInfo.videoInfo.setVideoName(mOutFileTime + ".mp4");
             editInfo.videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));
@@ -129,7 +129,7 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
         String cmd = String.format("ffmpeg -y -threads 2 -ss %f -t %f -i %s -r %d %s",
                 gifInfo.startTime,
                 gifInfo.endTime,
-                editInfo.videoInfo.getVideoPath(),
+                editInfo.videoInfo.getPath(),
                 gifInfo.frameRate, outTempPath);
         Log.i(TAG,"cmd:" + cmd);
         int result = FFmpegCmd.execute(cmd);
@@ -149,13 +149,13 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
 
         String outVideoTempPath = Constans.VIDEO_TEMP_PATH + mOutFileTime + "." + editInfo.videoFormat;
         String outVideoPath = Constans.VIDEO_PATH + "/" + mOutFileTime + "." + editInfo.videoFormat;
-        String cmd = "ffmpeg -i " + editInfo.videoInfo.getVideoPath() + "  -vcodec copy -acodec copy  " + outVideoTempPath;
+        String cmd = "ffmpeg -i " + editInfo.videoInfo.getPath() + "  -vcodec copy -acodec copy  " + outVideoTempPath;
         Log.i(TAG,"cmd:" + cmd);
         int result = FFmpegCmd.execute(cmd);
 
         //移到视频文件夹
         if (result == 0 && FileUtil.moveFile(outVideoTempPath, Constans.VIDEO_PATH)){
-            editInfo.videoInfo.setVideoPath(outVideoPath);
+            editInfo.videoInfo.setPath(outVideoPath);
             editInfo.videoInfo.setVideoTime(mOutFileTime);
             editInfo.videoInfo.setVideoName(mOutFileTime + "." + editInfo.videoFormat);
             editInfo.videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));

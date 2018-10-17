@@ -7,20 +7,11 @@ import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.ServiceException;
-import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
-import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
-import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
-import com.alibaba.sdk.android.oss.model.PutObjectRequest;
-import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.adapter.SubAdapter;
@@ -29,12 +20,9 @@ import com.ruanchao.videoedit.bean.EditInfo;
 import com.ruanchao.videoedit.bean.ToolItem;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
-import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.ui.tools.VideoEditToolActivity;
-import com.ruanchao.videoedit.util.AliOssUtil;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
-import com.ruanchao.videoedit.util.FFmpegUtil;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,8 +33,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.ruanchao.videoedit.ui.video.MainPresenter.VIDEO_LIST_TITLE_TYPE;
 
 public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> implements View.OnClickListener,IMainView {
 
@@ -228,7 +214,7 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         for (File videoFile : videoFiles){
             if(videoFile.exists()){
                 VideoInfo liveVideoInfo = new VideoInfo();
-                liveVideoInfo.setVideoPath(videoFile.getAbsolutePath());
+                liveVideoInfo.setPath(videoFile.getAbsolutePath());
                 liveVideoInfo.setVideoName(videoFile.getName());
                 liveVideoInfo.setVideoTime(videoFile.lastModified());
                 liveVideoInfo.setVideoTitle(DateUtil.timeToDate(videoFile.lastModified()));

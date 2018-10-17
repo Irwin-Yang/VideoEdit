@@ -73,7 +73,7 @@ public class VideoFormatChangeView extends BaseToolLayout implements View.OnClic
 
     public void setInputVideoInfo(VideoInfo mInputVideoInfo) {
         this.mInputVideoInfo = mInputVideoInfo;
-        mVideoPathView.setText(mInputVideoInfo.getVideoPath());
+        mVideoPathView.setText(mInputVideoInfo.getPath());
     }
 
 
