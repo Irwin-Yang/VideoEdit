@@ -20,6 +20,7 @@ import com.ruanchao.videoedit.view.state.SimpleMultiStateView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rx.Observable;
@@ -137,6 +138,7 @@ public class VideoListFragment extends Fragment{
             videoInfo.setVideoTime(file.lastModified());
             videoInfos.add(videoInfo);
         }
+        Collections.sort(videoInfos);
         return videoInfos;
     }
 

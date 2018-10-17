@@ -5,6 +5,7 @@ import android.media.effect.Effect;
 public class EditInfo {
 
     public static final int EDIT_TYPE_VIDEO_TO_GIF = 0;
+    public static final int EDIT_TYPE_VIDEO_FORMAT_CHANGE = 1;
     public static final int EDIT_TYPE_IMAGE_TO_VIDEO = 2;
 
     public VideoInfo videoInfo;
@@ -18,6 +19,8 @@ public class EditInfo {
     public GifInfo gifInfo;
 
     public ImageInfo imageInfo;
+
+    public String videoFormat;
 
     public static class GifInfo{
         public double startTime;

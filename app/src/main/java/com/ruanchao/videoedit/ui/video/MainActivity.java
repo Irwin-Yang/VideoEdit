@@ -1,5 +1,6 @@
 package com.ruanchao.videoedit.ui.video;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
@@ -143,6 +144,8 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_test:
+                Intent intent = new Intent(MainActivity.this, TestActivity.class);
+                startActivity(intent);
                 break;
 
             default:
@@ -164,41 +167,6 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         }
     }
 
-    /**
-     * 执行ffmpeg命令行
-     * @param commandLine commandLine
-     */
-    private void executeFFmpegCmd(final String commandLine){
-        if(commandLine == null){
-            return;
-        }
-        FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {
-            @Override
-            public void onBegin() {
-                Log.i(TAG, "handle video onBegin...");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this,"开始", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-            }
-
-            @Override
-            public void onEnd(int result) {
-                Log.i(TAG, "handle video onEnd...");
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this,"结束", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
-    }
-
     private void initList() {
         mImages.add(R.mipmap.banner1);
         mImages.add(R.mipmap.banner2);
@@ -212,8 +180,8 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         toolItem2.setItemIcon(R.mipmap.edit_video);
         mFastTools.add(toolItem2);
         ToolItem toolItem3 = new ToolItem();
-        toolItem3.setItemName("裁剪视频");
-        toolItem3.setItemIcon(R.mipmap.video_to_cut);
+        toolItem3.setItemName("照片美化");
+        toolItem3.setItemIcon(R.mipmap.picture_decorate);
         mFastTools.add(toolItem3);
 
         ToolItem toolItem4 = new ToolItem();
@@ -258,7 +226,7 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
         File[] videoFiles = file.listFiles();
         List<VideoInfo> list = new ArrayList<>();
         for (File videoFile : videoFiles){
-            if(videoFile.exists() && videoFile.getName().endsWith(".mp4")){
+            if(videoFile.exists()){
                 VideoInfo liveVideoInfo = new VideoInfo();
                 liveVideoInfo.setVideoPath(videoFile.getAbsolutePath());
                 liveVideoInfo.setVideoName(videoFile.getName());
@@ -281,6 +249,10 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
             case 1:
                 VideoEditActivity.start(this,null);
                 break;
+            case 2:
+                Intent intent = new Intent(MainActivity.this, TestActivity.class);
+                startActivity(intent);
+                break;
             default:
                 break;
         }
@@ -294,6 +266,7 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
                 VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_VIDEO_TO_GIF);
                 break;
             case 1:
+                VideoEditToolActivity.start(this , EditInfo.EDIT_TYPE_VIDEO_FORMAT_CHANGE);
                 break;
                 //视频转gif
             case 2:

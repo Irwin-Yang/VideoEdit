@@ -1,0 +1,39 @@
+apply plugin: 'com.android.library'
+//apply plugin: 'com.github.dcendents.android-maven'
+//group='com.github.hailindai'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.1.2"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    task makeJar(type: proguard.gradle.ProGuardTask, dependsOn: "build") {
+        injars 'build/intermediates/bundles/release/classes.jar'
+        outjars 'build/gpuvideo.jar'
+        configuration 'proguard.txt'
+    }
+
+    task makeAar(type: proguard.gradle.ProGuardTask, dependsOn: "build") {
+        injars 'build/outputs/aar/eyetrack-release.aar'
+        outjars 'build/EyeTrack.aar'
+        configuration 'proguard.txt'
+    }
+}
+
+dependencies {
+}

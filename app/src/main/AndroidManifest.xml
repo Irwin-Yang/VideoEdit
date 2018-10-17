@@ -10,8 +10,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
     <application
@@ -48,15 +50,15 @@
         </provider>
 
         <activity android:name=".ui.tools.VideoEditToolActivity" />
-        <activity android:name=".ui.video.VideoBoxListActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            ></activity>
-
+        <activity
+            android:name=".ui.video.VideoBoxListActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".ui.video.TestActivity"></activity>
     </application>
 
 </manifest>

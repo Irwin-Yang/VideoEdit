@@ -28,6 +28,7 @@ import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.tool.ImageToVideoView;
+import com.ruanchao.videoedit.view.tool.VideoFormatChangeView;
 import com.ruanchao.videoedit.view.tool.VideoToGifLayout;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
@@ -47,6 +48,7 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
     private VideoInfo mInputVideoInfo;
     private VideoToGifLayout mVideoToGifView;
     private ImageToVideoView mImageToVideoView;
+    private VideoFormatChangeView mVideoFormatChange;
     protected CommonTitleBar toolbar;
     private String TAG = VideoEditToolActivity.class.getSimpleName();
 
@@ -87,7 +89,16 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
         mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
         long videoDuration = FFmpegCmd.getVideoDuration(mInputVideoInfo.getVideoPath());
         mInputVideoInfo.setDuration(videoDuration);
-        mVideoToGifView.setInputVideoInfo(mInputVideoInfo);
+        switch (mEditType) {
+            case EditInfo.EDIT_TYPE_VIDEO_TO_GIF:
+                mVideoToGifView.setInputVideoInfo(mInputVideoInfo);
+                break;
+            case EditInfo.EDIT_TYPE_VIDEO_FORMAT_CHANGE:
+                mVideoFormatChange.setInputVideoInfo(mInputVideoInfo);
+                break;
+            default:
+                break;
+        }
     }
 
     private void setImageInfo(Intent data) {
@@ -124,6 +135,8 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
         mChooseVideo.setOnClickListener(this);
         mVideoToGifView = findViewById(R.id.video_to_gif_view);
         mImageToVideoView = findViewById(R.id.image_to_video_view);
+        mVideoFormatChange = findViewById(R.id.video_format_change_view);
+        mVideoFormatChange.setOnStartEditListener(this);
         mImageToVideoView.setOnStartEditListener(this);
         mVideoToGifView.setOnStartEditListener(this);
         toolbar = findViewById(R.id.titlebar);
@@ -142,16 +155,19 @@ public class VideoEditToolActivity extends BaseMvpActivity<IVideoEditToolView,Vi
     }
 
     private void showEditView() {
-        switch (mEditType){
+        switch (mEditType) {
             case EditInfo.EDIT_TYPE_VIDEO_TO_GIF:
                 mVideoToGifView.setVisibility(View.VISIBLE);
+                break;
+            case EditInfo.EDIT_TYPE_VIDEO_FORMAT_CHANGE:
+                mVideoFormatChange.setVisibility(View.VISIBLE);
                 break;
             case EditInfo.EDIT_TYPE_IMAGE_TO_VIDEO:
                 mImageToVideoView.setVisibility(View.VISIBLE);
                 mChooseVideo.setText("选择编辑图片");
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
     }
 

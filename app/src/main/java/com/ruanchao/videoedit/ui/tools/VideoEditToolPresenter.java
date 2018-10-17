@@ -11,7 +11,6 @@ import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
-import com.ruanchao.videoedit.util.FFmpegUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.tool.ImageToVideoView;
 
@@ -27,6 +26,8 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
     private static final String TAG = VideoEditToolPresenter.class.getSimpleName();
     private Context context;
     private long mOutFileTime = System.currentTimeMillis();
+    private String mOutVideoTempPath = Constans.VIDEO_TEMP_PATH + mOutFileTime + ".mp4";
+    private String mOutVideoPath = Constans.VIDEO_PATH + "/" + mOutFileTime + ".mp4";
 
     public VideoEditToolPresenter(Context context){
         this.context = context;
@@ -65,6 +66,9 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
             case EditInfo.EDIT_TYPE_IMAGE_TO_VIDEO:
                 result = imageToVideo(editInfo);
                 break;
+            case EditInfo.EDIT_TYPE_VIDEO_FORMAT_CHANGE:
+                result = videoFormatChange(editInfo);
+                break;
             default:
                 break;
         }
@@ -72,16 +76,13 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
     }
 
     private int imageToVideo(EditInfo editInfo) {
-
-        String outTempPath = Constans.VIDEO_TEMP_PATH + mOutFileTime + ".mp4";
-        String outPath = Constans.VIDEO_PATH + "/" + mOutFileTime + ".mp4";
         String cmd = "";
         if (editInfo.imageInfo.effect == ImageToVideoView.EFFECT_NO){
             cmd =  String.format("ffmpeg -y -threads 2 -loop 1  -i  %s -t %d -r 25 " +
                             "-vf scale=480:-1 -y %s",
                     editInfo.videoInfo.getVideoPath(),
                     editInfo.imageInfo.duration,
-                    outTempPath);
+                    mOutVideoTempPath);
         }else if (editInfo.imageInfo.effect == ImageToVideoView.EFFECT_ZOOM){
 
             //使用Options类来获取
@@ -99,13 +100,13 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
                     editInfo.imageInfo.duration * 25,
                     height,
                     editInfo.imageInfo.duration,
-                    outTempPath);
+                    mOutVideoTempPath);
         }
         Log.i(TAG,"cmd:" + cmd);
         int result = FFmpegCmd.execute(cmd);
         //移到视频文件夹
-        if (result == 0 && FileUtil.moveFile(outTempPath, Constans.VIDEO_PATH)){
-            editInfo.videoInfo.setVideoPath(outPath);
+        if (result == 0 && FileUtil.moveFile(mOutVideoTempPath, Constans.VIDEO_PATH)){
+            editInfo.videoInfo.setVideoPath(mOutVideoPath);
             editInfo.videoInfo.setVideoTime(mOutFileTime);
             editInfo.videoInfo.setVideoName(mOutFileTime + ".mp4");
             editInfo.videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));
@@ -143,4 +144,25 @@ public class VideoEditToolPresenter extends BasePresenter<IVideoEditToolView>{
         }
         return result;
     }
+
+    private int videoFormatChange(EditInfo editInfo) {
+
+        String outVideoTempPath = Constans.VIDEO_TEMP_PATH + mOutFileTime + "." + editInfo.videoFormat;
+        String outVideoPath = Constans.VIDEO_PATH + "/" + mOutFileTime + "." + editInfo.videoFormat;
+        String cmd = "ffmpeg -i " + editInfo.videoInfo.getVideoPath() + "  -vcodec copy -acodec copy  " + outVideoTempPath;
+        Log.i(TAG,"cmd:" + cmd);
+        int result = FFmpegCmd.execute(cmd);
+
+        //移到视频文件夹
+        if (result == 0 && FileUtil.moveFile(outVideoTempPath, Constans.VIDEO_PATH)){
+            editInfo.videoInfo.setVideoPath(outVideoPath);
+            editInfo.videoInfo.setVideoTime(mOutFileTime);
+            editInfo.videoInfo.setVideoName(mOutFileTime + "." + editInfo.videoFormat);
+            editInfo.videoInfo.setVideoTitle(DateUtil.timeToDate(mOutFileTime));
+            editInfo.videoInfo.setEditSuccess(true);
+            editInfo.videoInfo.setType(VideoInfo.TYPE_VIDEO);
+        }
+        return result;
+    }
+
 }

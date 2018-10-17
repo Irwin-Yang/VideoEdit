@@ -22,6 +22,8 @@ public class VideoInfo implements Serializable,Comparable<VideoInfo> {
     private float duration;
     private boolean isEditSuccess = false;
     private String imagePath;
+    public int width;
+    public int height;
 
     public String getVideoPath() {
         return videoPath;

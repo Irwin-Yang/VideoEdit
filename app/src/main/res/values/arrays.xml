@@ -6,4 +6,11 @@
         <item>左下方</item>
         <item>右下方</item>
     </string-array>
+
+    <string-array name="format_type">
+        <item>mp4</item>
+        <item>3gp </item>
+        <item>avi</item>
+        <item>mov</item>
+    </string-array>
 </resources>
