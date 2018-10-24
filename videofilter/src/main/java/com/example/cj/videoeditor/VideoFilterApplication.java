@@ -18,23 +18,12 @@ import java.nio.ByteBuffer;
  *
  */
 
-public class MyApplication extends Application{
+public class VideoFilterApplication {
+
     private static Context mContext;
 
-
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = this;
-        Log.e("thread","  线程值  "+Thread.currentThread());
-        Constants.init(this);
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-
+    public static void setContext(Context context){
+        mContext = context;
     }
 
     public static Context getContext() {

@@ -1,120 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
-        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar xmlns:titlebar="http://schemas.android.com/apk/res-auto"
         android:id="@+id/titlebar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        titlebar:leftType="textView"
-        titlebar:rightType="imageButton"
-        titlebar:titleBarColor="@color/common_theme_color"
-        titlebar:statusBarColor="@color/common_theme_color"
-        titlebar:statusBarMode="light"
-        titlebar:showBottomLine="false"
         titlebar:leftDrawable="@mipmap/back"
         titlebar:leftText="视频编辑"
         titlebar:leftTextColor="#ffffff"
-        titlebar:rightImageResource="@mipmap/finish_icon" />
+        titlebar:leftType="textView"
+        titlebar:rightImageResource="@mipmap/finish_icon"
+        titlebar:rightType="imageButton"
+        titlebar:showBottomLine="false"
+        titlebar:statusBarColor="@color/common_theme_color"
+        titlebar:statusBarMode="light"
+        titlebar:titleBarColor="@color/common_theme_color" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/titlebar">
 
-        <com.ruanchao.videoedit.view.FullScreenVideoView
-            android:id="@+id/videoView"
+        <com.pinssible.librecorder.player.SimplePinPlayerView
+            android:id="@+id/player_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            app:use_controller ="false"/>
 
         <ImageView
             android:id="@+id/iv_video_play"
-            android:visibility="gone"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:src="@mipmap/video_play_icon2"
-            />
-    </RelativeLayout>
+            android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:layout_margin="12dp">
-
-        <TextView
-            android:id="@+id/tv_add_bgm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edit_bg_shape"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:text="背景音乐"
-            android:textColor="#ffffff" />
-
-        <TextView
-            android:id="@+id/tv_add_watermark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/edit_bg_shape"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:clickable="true"
-            android:text="水印"
-            android:textColor="#ffffff" />
-
-        <TextView
-            android:id="@+id/tv_add_draw_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/edit_bg_shape"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:text="字幕"
-            android:textColor="#ffffff" />
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/ll_shade_view"
-        android:layout_below="@id/titlebar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/video_edit_bg"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="100dp"
-            />
-
-        <Button
-            android:id="@+id/btn_choose_video"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="100dp"
+        <com.ruanchao.videoedit.view.FilterView
+            android:id="@+id/filter_view"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:text="选择编辑视频"
-            android:textColor="#ffffff"
-            android:background="@drawable/edit_bg_shape" />
+            android:layout_above="@id/ll_action"
+            />
+
+        <LinearLayout
+
+            android:id="@+id/ll_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_add_bgm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edit_bg_shape"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="背景音乐"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_add_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/edit_bg_shape"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="滤镜"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_add_watermark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/edit_bg_shape"
+                android:clickable="true"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="水印"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_add_draw_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/edit_bg_shape"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="字幕"
+                android:textColor="#ffffff" />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
-</RelativeLayout>
+
+</LinearLayout>

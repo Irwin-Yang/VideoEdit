@@ -64,7 +64,7 @@ public class Constants {
         if (!f.exists()) {
             boolean b = f.mkdirs();
             if (!b) {
-                baseFolder = MyApplication.getContext().getExternalFilesDir(null).getAbsolutePath() + "/";
+                baseFolder = VideoFilterApplication.getContext().getExternalFilesDir(null).getAbsolutePath() + "/";
             }
         }
         return baseFolder;

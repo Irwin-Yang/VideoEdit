@@ -24,7 +24,7 @@ import android.util.Log;
 
 
 import com.example.cj.videoeditor.Constants;
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.filter.AFilter;
 import com.example.cj.videoeditor.filter.NoFilter;
 import com.example.cj.videoeditor.filter.RotationOESFilter;
@@ -105,9 +105,9 @@ class TextureRender {
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangleVertices.put(mTriangleVerticesData).position(0);
         Matrix.setIdentityM(mSTMatrix, 0);
-        mShow = new NoFilter(MyApplication.getContext().getResources());
+        mShow = new NoFilter(VideoFilterApplication.getContext().getResources());
         mShow.setMatrix(MatrixUtils.flip(MatrixUtils.getOriginalMatrix(), false, true));
-        rotationFilter = new RotationOESFilter(MyApplication.getContext().getResources());
+        rotationFilter = new RotationOESFilter(VideoFilterApplication.getContext().getResources());
     }
 
     public int getTextureId() {

@@ -42,4 +42,6 @@ public class Constans {
     public static final int TYPE_IMAGE = 1;
     public static final int TYPE_AUDIO = 2;
 
+    public static final double VIDEO_HANDLE_MAX_DURATION = 20;
+
 }

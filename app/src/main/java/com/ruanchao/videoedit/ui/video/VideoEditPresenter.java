@@ -2,8 +2,11 @@ package com.ruanchao.videoedit.ui.video;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.util.Log;
 
+import com.pinssible.librecorder.remux.PinRemuxer;
+import com.pinssible.librecorder.remux.RemuxerFactory;
 import com.ruanchao.videoedit.base.BasePresenter;
 import com.ruanchao.videoedit.bean.Music;
 import com.ruanchao.videoedit.bean.VideoInfo;
@@ -66,12 +69,20 @@ public class VideoEditPresenter extends BasePresenter<IVideoEditView>{
 
     }
 
+    public void addVideoFilter(VideoInfo inputVideoInfo, String desTempPath, RemuxerFactory.OnRemuxListener listener) {
+
+        String srcPath = inputVideoInfo.getPath();
+        PinRemuxer remuxer = new PinRemuxer(srcPath, desTempPath, listener);
+        remuxer.start(inputVideoInfo.getFilterType());
+    }
+
     private int ffmpegEditVideo(VideoInfo inputVideoInfo, WaterInfo mWaterInfo,Music bgMusicInfo) throws Exception{
         String mInputVideo = inputVideoInfo.getPath();
         StringBuffer sb = new StringBuffer();
         sb.append(String.format("ffmpeg -y -threads 2 -i %s ",mInputVideo));
         //控制视频最大时长为20s,避免视频过大耗时
-        double editVideoDuration = inputVideoInfo.getDuration() >20 ? 20:inputVideoInfo.getDuration();
+        double editVideoDuration = inputVideoInfo.getDuration() >Constans.VIDEO_HANDLE_MAX_DURATION ?
+                Constans.VIDEO_HANDLE_MAX_DURATION:inputVideoInfo.getDuration();
 
         if (bgMusicInfo != null && mWaterInfo != null){
 

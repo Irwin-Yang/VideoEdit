@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 
@@ -59,6 +60,7 @@ public class VideoPreviewView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        Log.i("VideoPreviewView","onSurfaceCreated");
         mDrawer.onSurfaceCreated(gl,config);
         SurfaceTexture surfaceTexture = mDrawer.getSurfaceTexture();
         surfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {

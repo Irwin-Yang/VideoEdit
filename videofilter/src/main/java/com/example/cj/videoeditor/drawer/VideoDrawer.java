@@ -78,11 +78,11 @@ public class VideoDrawer implements GLSurfaceView.Renderer {
         MatrixUtils.flip(OM,false,true);//矩阵上下翻转
 //        mShow.setMatrix(OM);
 
-        WaterMarkFilter waterMarkFilter = new WaterMarkFilter(res);
-        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.watermark));
-
-        waterMarkFilter.setPosition(0,70,0,0);
-        mBeFilter.addFilter(waterMarkFilter);
+//        WaterMarkFilter waterMarkFilter = new WaterMarkFilter(res);
+//        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.watermark));
+//
+//        waterMarkFilter.setPosition(0,70,0,0);
+//        mBeFilter.addFilter(waterMarkFilter);
 
     }
 

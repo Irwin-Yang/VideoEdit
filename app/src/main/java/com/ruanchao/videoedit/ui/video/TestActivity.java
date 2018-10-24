@@ -10,9 +10,6 @@ import android.util.Log;
 import android.view.Surface;
 import android.widget.ImageView;
 
-import com.dreamguard.gpuvideo.GPUVideoView;
-import com.dreamguard.gpuvideo.IVideoSurface;
-import com.dreamguard.gpuvideo.filter.textureoes.GPUVideoMonochromeFilter;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.util.BitmapUtil;
 import com.ruanchao.videoedit.util.Constans;
@@ -27,7 +24,6 @@ public class TestActivity extends AppCompatActivity {
 
     private ImageView mTestImage;
     private MediaPlayer mediaPlayer;
-    private GPUVideoView videoView;
     private SurfaceTexture mSurfaceTexture;
 
     @Override
@@ -35,9 +31,7 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         mTestImage = findViewById(R.id.iv_test_image);
-        videoView = (GPUVideoView) findViewById(R.id.videoView);
         //initGpuImage();
-        initGPUVideoView();
     }
 
     private void initGpuImage() {
@@ -62,18 +56,6 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-    public void initGPUVideoView() {
-        videoView.init(new IVideoSurface() {
-            @Override
-            public void onCreated(SurfaceTexture surfaceTexture) {
-                mSurfaceTexture = surfaceTexture;
-                initPlayer(mSurfaceTexture);
-            }
-        });
-
-        //GPUVideoColorInvertFilter invertFilter = new GPUVideoColorInvertFilter();
-        videoView.setFilter(new GPUVideoMonochromeFilter());
-    }
 
     public void initPlayer(SurfaceTexture surfaceTexture) {
 

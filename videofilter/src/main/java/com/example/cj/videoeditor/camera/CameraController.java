@@ -7,7 +7,7 @@ import android.hardware.Camera;
 import android.util.Log;
 
 import com.example.cj.videoeditor.Constants;
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 
 import java.io.IOException;
 import java.util.ArrayList;

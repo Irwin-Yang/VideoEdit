@@ -28,6 +28,9 @@ public class BaseActivity extends Activity{
     }
 
     public void showProgressDialog(String title, String msg){
+        if (mProgressDialog != null && mProgressDialog.isShowing()){
+            return;
+        }
         mProgressDialog = ProgressDialog.show(this, title, msg, false, false);
     }
 }

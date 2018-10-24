@@ -25,7 +25,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.R;
 import com.example.cj.videoeditor.filter.AFilter;
 import com.example.cj.videoeditor.filter.GroupFilter;
@@ -135,17 +135,17 @@ public class TextureRender {
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangleVertices.put(mTriangleVerticesData).position(0);
         Matrix.setIdentityM(mSTMatrix, 0);
-        Resources resources = MyApplication.getContext().getResources();
+        Resources resources = VideoFilterApplication.getContext().getResources();
         mShow = new NoFilter(resources);
         mShow.setMatrix(MatrixUtils.flip(MatrixUtils.getOriginalMatrix(), false, true));
         rotationFilter = new RotationOESFilter(resources);
         mBeFilter = new GroupFilter(resources);
-        //默认加上水印 可以取消掉
-        WaterMarkFilter waterMarkFilter = new WaterMarkFilter(resources);
-        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.watermark));
-
-        waterMarkFilter.setPosition(0, 70, 0, 0);
-        mBeFilter.addFilter(waterMarkFilter);
+//        //默认加上水印 可以取消掉
+//        WaterMarkFilter waterMarkFilter = new WaterMarkFilter(resources);
+//        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.watermark));
+//
+//        waterMarkFilter.setPosition(0, 70, 0, 0);
+//        mBeFilter.addFilter(waterMarkFilter);
         OM = MatrixUtils.getOriginalMatrix();
         MatrixUtils.flip(OM, false, false);//矩阵上下翻转
         mBeFilter.setMatrix(OM);

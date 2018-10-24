@@ -28,6 +28,9 @@ public class VideoInfo implements Serializable,Comparable<VideoInfo> {
     public int cutPoint;//剪切的开始点
     public int cutDuration;//剪切的时长
 
+    private int filterType;
+
+
     public String getPath() {
         return path;
     }
@@ -99,6 +102,14 @@ public class VideoInfo implements Serializable,Comparable<VideoInfo> {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public int getFilterType() {
+        return filterType;
+    }
+
+    public void setFilterType(int filterType) {
+        this.filterType = filterType;
     }
 
 }

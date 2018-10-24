@@ -2,7 +2,7 @@ package com.example.cj.videoeditor.utils;
 
 import android.content.res.Resources;
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 
 import java.io.InputStream;
 
@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class OpenGlUtils {
     //通过资源路径加载shader脚本文件
     public static String uRes(String path) {
-        Resources resources = MyApplication.getContext().getResources();
+        Resources resources = VideoFilterApplication.getContext().getResources();
         StringBuilder result = new StringBuilder();
         try {
             InputStream is = resources.getAssets().open(path);

@@ -2,7 +2,7 @@ package com.example.cj.videoeditor.gpufilter.filter;
 
 import android.opengl.GLES20;
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.R;
 import com.example.cj.videoeditor.gpufilter.basefilter.GPUImageFilter;
 import com.example.cj.videoeditor.gpufilter.utils.OpenGlUtils;
@@ -55,10 +55,10 @@ public class MagicHefeFilter extends GPUImageFilter {
 		setFloat(mGLStrengthLocation, 1.0f);
 	    runOnDraw(new Runnable(){
 		    public void run(){
-		    	inputTextureHandles[0] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/edgeburn.png");
-				inputTextureHandles[1] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/hefemap.png");
-				inputTextureHandles[2] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/hefemetal.png");
-				inputTextureHandles[3] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/hefesoftlight.png");
+		    	inputTextureHandles[0] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/edgeburn.png");
+				inputTextureHandles[1] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/hefemap.png");
+				inputTextureHandles[2] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/hefemetal.png");
+				inputTextureHandles[3] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/hefesoftlight.png");
 		    }
 	    });
 	}

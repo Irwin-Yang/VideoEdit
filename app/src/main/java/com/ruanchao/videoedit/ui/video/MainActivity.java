@@ -233,7 +233,7 @@ public class MainActivity extends BaseMvpActivity<IMainView,MainPresenter> imple
                 RecordActivity.startRecordActivity(MainActivity.this);
                 break;
             case 1:
-                VideoEditActivity.start(this,null);
+                ChooseVideoActivity.start(this);
                 break;
             case 2:
                 Intent intent = new Intent(MainActivity.this, TestActivity.class);

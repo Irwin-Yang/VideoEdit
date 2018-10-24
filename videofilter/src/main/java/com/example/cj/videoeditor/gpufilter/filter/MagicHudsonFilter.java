@@ -3,7 +3,7 @@ package com.example.cj.videoeditor.gpufilter.filter;
 import android.opengl.GLES20;
 
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.R;
 import com.example.cj.videoeditor.gpufilter.basefilter.GPUImageFilter;
 import com.example.cj.videoeditor.gpufilter.utils.OpenGlUtils;
@@ -57,9 +57,9 @@ public class MagicHudsonFilter extends GPUImageFilter {
 		setFloat(mGLStrengthLocation, 1.0f);
 	    runOnDraw(new Runnable(){
 		    public void run(){
-		    	inputTextureHandles[0] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/hudsonbackground.png");
-				inputTextureHandles[1] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/overlaymap.png");
-				inputTextureHandles[2] = OpenGlUtils.loadTexture(MyApplication.getContext(), "filter/hudsonmap.png");
+		    	inputTextureHandles[0] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/hudsonbackground.png");
+				inputTextureHandles[1] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/overlaymap.png");
+				inputTextureHandles[2] = OpenGlUtils.loadTexture(VideoFilterApplication.getContext(), "filter/hudsonmap.png");
 		    }
 	    });
 	}

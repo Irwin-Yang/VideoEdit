@@ -2,22 +2,32 @@ package com.ruanchao.videoedit.ui.video;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.BottomSheetDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.jph.takephoto.app.TakePhoto;
 import com.jph.takephoto.app.TakePhotoImpl;
 import com.jph.takephoto.model.CropOptions;
@@ -27,6 +37,9 @@ import com.jph.takephoto.model.TResult;
 import com.jph.takephoto.permission.InvokeListener;
 import com.jph.takephoto.permission.PermissionManager;
 import com.jph.takephoto.permission.TakePhotoInvocationHandler;
+import com.pinssible.librecorder.player.PinMediaPlayer;
+import com.pinssible.librecorder.player.SimplePinPlayerView;
+import com.pinssible.librecorder.remux.RemuxerFactory;
 import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.base.BaseMvpActivity;
@@ -35,20 +48,27 @@ import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.bean.WaterInfo;
 import com.ruanchao.videoedit.event.EditFinishMsg;
 import com.ruanchao.videoedit.ffmpeg.FFmpegCmd;
+import com.ruanchao.videoedit.util.BitmapUtil;
 import com.ruanchao.videoedit.util.Constans;
 import com.ruanchao.videoedit.util.DateUtil;
+import com.ruanchao.videoedit.util.DensityUtil;
 import com.ruanchao.videoedit.util.FileUtil;
 import com.ruanchao.videoedit.view.AddWaterView;
+import com.ruanchao.videoedit.view.FilterView;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
+import jp.co.cyberagent.android.gpuimage.GPUImage;
+import jp.co.cyberagent.android.gpuimage.GPUImageGrayscaleFilter;
 import rx.Subscriber;
 
-public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditPresenter> implements View.OnClickListener, IVideoEditView, InvokeListener, MediaPlayer.OnCompletionListener {
+public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditPresenter> implements View.OnClickListener, IVideoEditView, InvokeListener {
 
     private static final String VIDEO_INFO = "video_info";
     private static final String TAG = VideoEditActivity.class.getSimpleName();
@@ -65,21 +85,75 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     private InvokeParam invokeParam;
     private Uri imageUri;
     private AddWaterView mAddWaterView;
+    private TextView mAddFilter;
     private String mMusicPath;
-    private View mShadeView;
-    private Button mChooseVideo;
-    private VideoView mVideoView;
-    ImageView mVideoPlayView;
-    public static final int REQUEST_CODE = 100;
-    private static final int CHOOSE_VIDEO_CODE = 101;
+    //view
+    private SimplePinPlayerView previewSurface;
+    //player
+    private PinMediaPlayer player;
+    private FilterView mFilterView;
 
+    public static final int REQUEST_CODE = 100;
     private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getTakePhoto().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_edit);
         init();
+    }
+
+    private void init() {
+        mBottomSheetDialog = new BottomSheetDialog(this);
+        mToast = Toast.makeText(this,"", Toast.LENGTH_LONG);
+        toolbar = findViewById(R.id.titlebar);
+        toolbar.setListener(new CommonTitleBar.OnTitleBarListener() {
+            @Override
+            public void onClicked(View v, int action, String extra) {
+                if (action == CommonTitleBar.ACTION_LEFT_TEXT) {
+                    finish();
+                }else if (action == CommonTitleBar.ACTION_RIGHT_BUTTON){
+                    recordFinish();
+                }
+            }
+        });
+        mAddBgm = findViewById(R.id.tv_add_bgm);
+        mAddBgm.setOnClickListener(this);
+        mAddWatermark = findViewById(R.id.tv_add_watermark);
+        mAddWatermark.setOnClickListener(this);
+        mAddDrawText = findViewById(R.id.tv_add_draw_text);
+        mAddDrawText.setOnClickListener(this);
+        mAddFilter = findViewById(R.id.tv_add_filter);
+        mAddFilter.setOnClickListener(this);
+        mFilterView = findViewById(R.id.filter_view);
+        mFilterView.setFilterItemOnclickListener(new FilterView.FilterItemOnclickListener() {
+            @Override
+            public void onItemClick(int position) {
+                mInputVideoInfo.setFilterType(position);
+                player.setFilter(position);
+            }
+        });
+        mInputVideoInfo = new VideoInfo();
+        Serializable videoInfoSer = getIntent().getSerializableExtra(VIDEO_INFO);
+        mInputVideoInfo = (VideoInfo) videoInfoSer;
+        previewSurface = findViewById(R.id.player_view);
+        initMediaPlayer();
+    }
+
+    private void initMediaPlayer() {
+        //player
+        Uri source = Uri.parse(mInputVideoInfo.getPath());
+        try {
+            player = new PinMediaPlayer(this, source, true);
+            previewSurface.setPlayer(player);
+            player.getExoPlayer().setRepeatMode(Player.REPEAT_MODE_ALL);
+            player.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this,"create player fail",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -96,7 +170,21 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     @Override
     protected void onResume() {
         super.onResume();
-        startVideo();
+        initMediaPlayer();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        previewSurface.getVideoSurfaceView().release();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (previewSurface.getVideoSurfaceView() != null) {
+            previewSurface.getVideoSurfaceView().onPause();
+        }
     }
 
     @Override
@@ -119,21 +207,6 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                     mMusicPath = musicPath;
                 }
                 break;
-            case CHOOSE_VIDEO_CODE:
-                Uri uri = data.getData();
-                mVideoView.setVideoURI(uri);
-                startVideo();
-                mShadeView.setVisibility(View.GONE);
-                toolbar.getRightImageButton().setVisibility(View.VISIBLE);
-                String path = FileUtil.getFilePathByUri(this, uri);
-                File file = new File(path);
-                mInputVideoInfo = new VideoInfo();
-                mInputVideoInfo.setPath(path);
-                mInputVideoInfo.setVideoName(file.getName());
-                mInputVideoInfo.setVideoTime(file.lastModified());
-                mInputVideoInfo.setVideoName(DateUtil.timeToDate(file.lastModified()));
-                setVideoInfo();
-                break;
                 default:
                     break;
         }
@@ -142,64 +215,59 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mHandler.removeCallbacks(null);
-    }
-
-    private void init() {
-        mBottomSheetDialog = new BottomSheetDialog(this);
-        mToast = Toast.makeText(this,"", Toast.LENGTH_LONG);
-        toolbar = findViewById(R.id.titlebar);
-        toolbar.setListener(new CommonTitleBar.OnTitleBarListener() {
-            @Override
-            public void onClicked(View v, int action, String extra) {
-                if (action == CommonTitleBar.ACTION_LEFT_TEXT) {
-                    finish();
-                }else if (action == CommonTitleBar.ACTION_RIGHT_BUTTON){
-                    recordFinish();
-                }
-            }
-        });
-        mVideoView = (VideoView) findViewById(R.id.videoView);
-        MediaController mediaController = new MediaController(this);
-        mediaController.setVisibility(View.GONE);        //隐藏进度条
-        mVideoView.setMediaController(mediaController);
-        mVideoView.setOnCompletionListener(this);
-        mAddBgm = findViewById(R.id.tv_add_bgm);
-        mAddBgm.setOnClickListener(this);
-        mAddWatermark = findViewById(R.id.tv_add_watermark);
-        mAddWatermark.setOnClickListener(this);
-        mAddDrawText = findViewById(R.id.tv_add_draw_text);
-        mAddDrawText.setOnClickListener(this);
-        mInputVideoInfo = new VideoInfo();
-        mShadeView = findViewById(R.id.ll_shade_view);
-        mChooseVideo = findViewById(R.id.btn_choose_video);
-        mChooseVideo.setOnClickListener(this);
-        mVideoPlayView = findViewById(R.id.iv_video_play);
-        mVideoPlayView.setOnClickListener(this);
-        Serializable videoInfoSer = getIntent().getSerializableExtra(VIDEO_INFO);
-        if (videoInfoSer == null){
-            toolbar.getRightImageButton().setVisibility(View.GONE);
-        }else {
-            mInputVideoInfo = (VideoInfo) videoInfoSer;
-            setVideoInfo();
+        if (previewSurface.getVideoSurfaceView() != null) {
+            previewSurface.getVideoSurfaceView().release();
         }
-    }
-
-    private void setVideoInfo() {
-        mShadeView.setVisibility(View.GONE);
-        toolbar.getRightImageButton().setVisibility(View.VISIBLE);
-        Uri videoUri = Uri.parse(mInputVideoInfo.getPath());
-        mVideoView.setVideoURI(videoUri);
-        startVideo();
-        mInputVideoInfo.setDuration(FFmpegCmd.getVideoDuration(mInputVideoInfo.getPath()));
-    }
-
-    private void startVideo(){
-        mVideoPlayView.setVisibility(View.GONE);
-        mVideoView.start();
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     private void recordFinish() {
+        if (mInputVideoInfo.getFilterType() != 0){
+            //进行滤镜处理
+            //remuxer
+            final String desTempPath = Constans.VIDEO_TEMP_PATH + System.currentTimeMillis() + ".mp4";
+            mPresenter.addVideoFilter(mInputVideoInfo,desTempPath, new RemuxerFactory.OnRemuxListener() {
+                @Override
+                public void onRemuxStart(long totalPts) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showProgressDialog("提示","视频编辑中，请稍后。。。");
+                        }
+                    });
+                }
+
+                @Override
+                public void onRemuxProcess(long pts) {
+
+                }
+
+                @Override
+                public void onRemuxFinish() {
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mInputVideoInfo.setPath(desTempPath);
+                            editVideo();
+                        }
+                    },500);
+                }
+
+                @Override
+                public void onRemuxFail(Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(VideoEditActivity.this, "添加滤镜失败，开始编辑视频", Toast.LENGTH_LONG).show();
+                            editVideo();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private void editVideo(){
         mPresenter.doEditVideo(mInputVideoInfo,mWaterInfo,mMusic,new Subscriber<VideoInfo>() {
             @Override
             public void onStart() {
@@ -257,6 +325,9 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
 
     @Override
     public void onClick(View v) {
+        if (v.getId() != R.id.tv_add_filter){
+            mFilterView.setVisibility(View.INVISIBLE);
+        }
         switch (v.getId()){
             case R.id.tv_add_bgm:
                 showAddBgMusic();
@@ -266,14 +337,8 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
                 break;
             case R.id.tv_add_draw_text:
                 break;
-            case R.id.btn_choose_video:
-                Intent intent = new Intent();
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, CHOOSE_VIDEO_CODE);
-                break;
-            case R.id.iv_video_play:
-                startVideo();
+            case R.id.tv_add_filter:
+                mFilterView.setVisibility(View.VISIBLE);
                 break;
                 default:
                     break;
@@ -320,8 +385,6 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         }
         return takePhoto;
     }
-
-
 
     public void showAddWater() {
         mAddWaterView = new AddWaterView(VideoEditActivity.this);
@@ -421,9 +484,7 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onPointerCaptureChanged(boolean hasCapture) {
 
-        mVideoPlayView.setVisibility(View.VISIBLE);
     }
-
 }

@@ -21,7 +21,7 @@ import android.util.Log;
 import android.view.Surface;
 
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.drawer.TextureRender;
 import com.example.cj.videoeditor.gpufilter.basefilter.GPUImageFilter;
 import com.example.cj.videoeditor.media.VideoInfo;
@@ -81,7 +81,7 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
 //        mTextureRender = new TextureRender(info);
 //        mTextureRender.surfaceCreated();
 
-      /*  mDrawer = new VideoDrawer(MyApplication.getContext(),MyApplication.getContext().getResources());
+      /*  mDrawer = new VideoDrawer(VideoFilterApplication.getContext(),VideoFilterApplication.getContext().getResources());
 
         mDrawer.onSurfaceCreated(null,null);
         if (info.rotation == 0 || info.rotation == 180){

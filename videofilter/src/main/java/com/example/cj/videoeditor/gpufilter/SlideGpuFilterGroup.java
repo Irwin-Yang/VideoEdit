@@ -5,7 +5,7 @@ import android.view.MotionEvent;
 import android.widget.Scroller;
 
 import com.example.cj.videoeditor.Constants;
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 import com.example.cj.videoeditor.gpufilter.basefilter.GPUImageFilter;
 import com.example.cj.videoeditor.gpufilter.helper.MagicFilterFactory;
 import com.example.cj.videoeditor.gpufilter.helper.MagicFilterType;
@@ -43,7 +43,7 @@ public class SlideGpuFilterGroup {
 
     public SlideGpuFilterGroup() {
         initFilter();
-        scroller = new Scroller(MyApplication.getContext());
+        scroller = new Scroller(VideoFilterApplication.getContext());
     }
 
     private void initFilter() {

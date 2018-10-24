@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.video.ChooseVideoActivity">
+
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        titlebar:leftType="textView"
+        titlebar:titleBarColor="@color/common_theme_color"
+        titlebar:statusBarColor="@color/common_theme_color"
+        titlebar:statusBarMode="light"
+        titlebar:showBottomLine="false"
+        titlebar:leftDrawable="@mipmap/back"
+        titlebar:leftText="视频选择"
+        titlebar:leftTextColor="#ffffff" />
+
+    <RelativeLayout
+        android:id="@+id/ll_shade_view"
+        android:layout_below="@id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/video_edit_bg"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="100dp"
+            />
+
+        <Button
+            android:id="@+id/btn_choose_video"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="选择编辑视频"
+            android:textColor="#ffffff"
+            android:background="@drawable/edit_bg_shape" />
+
+    </RelativeLayout>
+
+</LinearLayout>

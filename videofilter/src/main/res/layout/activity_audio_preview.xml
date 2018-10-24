@@ -5,7 +5,7 @@
     android:background="#000000">
 
     <com.example.cj.videoeditor.widget.VideoPreviewView
-        android:id="@+id/videoView"
+        android:id="@+id/videoView_old"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

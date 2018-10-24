@@ -8,7 +8,7 @@ import android.hardware.SensorManager;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.example.cj.videoeditor.MyApplication;
+import com.example.cj.videoeditor.VideoFilterApplication;
 
 import java.util.Calendar;
 
@@ -42,7 +42,7 @@ public class SensorControler implements SensorEventListener {
     private int foucsing = 1;  //1 表示没有被锁定 0表示被锁定
 
     private SensorControler() {
-        mSensorManager = (SensorManager) MyApplication.getContext().getSystemService(Activity.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) VideoFilterApplication.getContext().getSystemService(Activity.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);// TYPE_GRAVITY
     }
 
