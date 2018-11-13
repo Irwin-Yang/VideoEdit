@@ -62,7 +62,8 @@
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".ui.video.TestActivity" />
-        <activity android:name=".ui.video.ChooseVideoActivity"></activity>
+        <activity android:name=".ui.video.ChooseVideoActivity" />
+        <activity android:name=".ui.video.MediaCodecRecordActivity" />
     </application>
 
 </manifest>

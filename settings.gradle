@@ -1,1 +1,1 @@
-include ':app',':libRecorderEditor'
+include ':app',':libRecorderEditor', ':video_demo', ':svideo_recordr'

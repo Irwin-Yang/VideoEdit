@@ -20,7 +20,7 @@ public abstract class Muxer {
 
     public static enum FORMAT {MPEG4, HLS}
 
-    private final int mExpectedNumTracks = 1;           // TODO: Make this configurable? yes,wait to do
+    private final int mExpectedNumTracks = 2;           // TODO: Make this configurable? yes,wait to do
 
     protected FORMAT mFormat;
     protected String mOutputPath;
