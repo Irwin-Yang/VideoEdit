@@ -5,78 +5,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/main_tv_tip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="150dp"
-        android:elevation="1dp"
-        android:text="双击放大"
-        android:textColor="#FFFFFF" />
-
-
-    <SurfaceView
-        android:id="@+id/main_surface_view"
+    <com.pinssible.librecorder.view.GLTextureView
+        android:id="@+id/surface_show"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
 
     <LinearLayout
+        android:id="@+id/ll_record_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginBottom="40dp"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/main_press_control"
+        <com.ruanchao.videoedit.view.BothWayProgressBar
+            android:id="@+id/main_progress_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="2dp"
+            android:background="#ffffff" />
 
-            <com.ruanchao.videoedit.view.BothWayProgressBar
-                android:id="@+id/main_progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#ffffff" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/main_progress_bar"
+            android:layout_marginTop="20dp">
 
-            <ImageView
-                android:id="@+id/iv_record_img"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="30dp"
+            <com.ruanchao.videoedit.view.RecordButton
+                android:id="@+id/btn_record"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerHorizontal="true"
                 android:gravity="center"
-                android:padding="10dp"
-                android:src="@mipmap/end_record" />
+                android:text="开始拍"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
 
             <ImageView
-                android:id="@+id/iv_return_record"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/iv_record_img"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:padding="10dp"
-                android:visibility="invisible"
-                android:src="@mipmap/return_record" />
-
-            <ImageView
-                android:id="@+id/iv_record_success"
+                android:id="@+id/iv_filter_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/iv_record_img"
-                android:visibility="invisible"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:padding="10dp"
-                android:src="@mipmap/success_record" />
-
+                android:layout_marginRight="30dp"
+                android:layout_toLeftOf="@id/btn_record"
+                android:src="@mipmap/beautify_picture" />
 
         </RelativeLayout>
 
     </LinearLayout>
+
+    <com.ruanchao.videoedit.view.FilterView
+        android:id="@+id/ll_filter_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="#30000000"
+        android:layout_gravity="bottom"
+        android:padding="10dp"
+        >
+
+    </com.ruanchao.videoedit.view.FilterView>
 
     <com.wuhenzhizao.titlebar.widget.CommonTitleBar
         xmlns:titlebar="http://schemas.android.com/apk/res-auto"

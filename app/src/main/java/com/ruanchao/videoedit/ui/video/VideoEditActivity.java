@@ -43,6 +43,7 @@ import com.pinssible.librecorder.remux.RemuxerFactory;
 import com.ruanchao.videoedit.MainApplication;
 import com.ruanchao.videoedit.R;
 import com.ruanchao.videoedit.base.BaseMvpActivity;
+import com.ruanchao.videoedit.bean.FilterInfo;
 import com.ruanchao.videoedit.bean.Music;
 import com.ruanchao.videoedit.bean.VideoInfo;
 import com.ruanchao.videoedit.bean.WaterInfo;
@@ -129,9 +130,9 @@ public class VideoEditActivity extends BaseMvpActivity<IVideoEditView,VideoEditP
         mFilterView = findViewById(R.id.filter_view);
         mFilterView.setFilterItemOnclickListener(new FilterView.FilterItemOnclickListener() {
             @Override
-            public void onItemClick(int position) {
-                mInputVideoInfo.setFilterType(position);
-                player.setFilter(position);
+            public void onItemClick(FilterInfo filterInfo) {
+                mInputVideoInfo.setFilterType(filterInfo.getFilterID());
+                player.setFilter(filterInfo.getFilterID());
             }
         });
         mInputVideoInfo = new VideoInfo();

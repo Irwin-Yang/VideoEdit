@@ -18,6 +18,7 @@
 
     <color name="all_tool_bg_color">#cecece</color>
     <color name="edit_bg_click_color">#FF4081</color>
+    <color name="record_bg_color">#fe2c55</color>
 
 
     <!--加载进度状态 参数-->

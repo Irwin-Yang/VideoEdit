@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+#add_library 制定要编译的库,并将所有的.c和.cpp文件包含其中
 add_library( # Sets the name of the library.
              ffmpegcmd
 
@@ -19,6 +20,7 @@ add_library( # Sets the name of the library.
 add_library( avcodec
              SHARED
              IMPORTED)
+#设置库的一些属性
 set_target_properties( avcodec
                        PROPERTIES IMPORTED_LOCATION
                        ${CMAKE_SOURCE_DIR}/src/main/cpp/ffmpeg/armeabi-v7a/libavcodec.so)
@@ -81,6 +83,7 @@ find_library( # Sets the name of the path variable.
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+# target_link_libraries 将编译的库与其他库相关联
 target_link_libraries( # Specifies the target library.
 
                        ffmpegcmd
